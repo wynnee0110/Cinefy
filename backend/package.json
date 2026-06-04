@@ -1,0 +1,14 @@
+{
+  "name": "cinefy-backend",
+  "version": "1.0.0",
+  "description": "Cinefy backend API server",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test:tmdb": "node src/test.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  }
+}
