@@ -4,11 +4,12 @@
   "description": "Cinefy backend API server",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "test:tmdb": "node src/test.js"
   },
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^16.0.0"
   }
 }
