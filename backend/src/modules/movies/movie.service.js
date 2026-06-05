@@ -22,3 +22,15 @@ exports.getMovie = async (id) => {
 
     return response.json();
 };
+
+exports.search = async (query) => {
+    if (!query || !query.trim()) {
+        return { page: 1, results: [], total_pages: 1, total_results: 0 };
+    }
+    const response = await fetch(
+        `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}`,
+        { headers }
+    );
+
+    return response.json();
+};

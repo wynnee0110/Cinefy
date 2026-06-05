@@ -1,5 +1,6 @@
 const API_URL = "http://localhost:5000";
 
+
 export async function getPopularMovies() {
   const response = await fetch(
     `${API_URL}/movies/popular`
@@ -13,5 +14,14 @@ export async function getMovie(id: string | number) {
     `${API_URL}/movies/${id}`
   );
 
+  return response.json();
+}
+
+
+
+export async function searchMovies(query: string) {
+  const response = await fetch(
+  `${API_URL}/movies/search?q=${encodeURIComponent(query)}`
+);
   return response.json();
 }

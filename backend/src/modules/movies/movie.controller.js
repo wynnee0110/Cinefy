@@ -25,3 +25,14 @@ exports.getMovie = async (req, res) => {
         });
     }
 };
+
+exports.search = async (req, res) => {
+    try {
+        const movies = await movieService.search(req.query.q);
+        res.json(movies);
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        });
+    }
+};

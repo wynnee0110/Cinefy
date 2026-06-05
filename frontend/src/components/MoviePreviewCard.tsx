@@ -24,7 +24,7 @@ export default function MoviePreviewCard({
         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
         alt={movie.title}
         className={`
-          w-[220px] h-[330px] object-cover rounded-md
+          w-[320px] h-[400px] object-cover rounded-md
           transition-all duration-300 cursor-pointer
           ${isHovered ? "opacity-0" : "opacity-100"}
         `}
@@ -32,10 +32,11 @@ export default function MoviePreviewCard({
 
       {/* Floating Preview */}
       {isHovered && (
-        <div
+        <div  
           className="
             absolute top-0 left-0
-            w-[420px]
+            w-[320px]
+            h-[400px]
             bg-zinc-900
             rounded-xl
             overflow-hidden
@@ -68,15 +69,19 @@ export default function MoviePreviewCard({
                     text-black
                     px-5
                     py-1.5
-                    rounded-md
+                    rounded-full
                     font-bold
                     flex items-center gap-1.5
                     hover:bg-zinc-200
                     text-sm
                     transition
                   "
+                  
                 >
-                  ▶ Play
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+                  <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+                </svg>
+                   Play
                 </button>
                 <button
                   onClick={() => onMoreInfo?.(movie.id)}
@@ -93,7 +98,7 @@ export default function MoviePreviewCard({
                     transition
                   "
                 >
-                  ⓘ Info
+                  Info
                 </button>
               </div>
             </div>

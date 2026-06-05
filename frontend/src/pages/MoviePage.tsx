@@ -7,6 +7,23 @@ export default function MoviePage() {
   const navigate = useNavigate();
   const [movie, setMovie] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPlayer, setShowPlayer] = useState(false);
+
+
+  useEffect(() => {
+  if (showPlayer) {
+    // lock scroll
+    document.body.style.overflow = "hidden";
+  } else {
+    // restore scroll
+    document.body.style.overflow = "auto";
+  }
+
+  // cleanup in case component unmounts while open
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [showPlayer]);
 
   useEffect(() => {
     async function loadMovie() {
@@ -132,19 +149,15 @@ export default function MoviePage() {
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            <button
-              onClick={() => {
-                if (trailerKey) {
-                  window.open(`https://www.youtube.com/watch?v=${trailerKey}`, "_blank");
-                }
-              }}
-              className="bg-white text-black px-10 py-3.5 rounded-md font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-              Play
-            </button>
+<button
+  onClick={() => setShowPlayer(true)}
+  className="bg-white text-black px-10 py-3.5 rounded-md font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 fill-current" viewBox="0 0 24 24">
+    <path d="M8 5v14l11-7z" />
+  </svg>
+  Play
+</button>
 
             <button
               onClick={() => {
@@ -301,6 +314,27 @@ export default function MoviePage() {
           </div>
         </div>
       </section>
+
+      {showPlayer && (
+  <div className="fixed inset-0 z-50 bg-black">
+    
+    {/* Close button */}
+    <button
+      onClick={() => setShowPlayer(false)}
+      className="absolute top-5 right-5 text-white text-3xl z-50"
+    >
+      ✕
+    </button>
+
+    {/* VidKing FULL VIDEO */}
+    <iframe
+      src={`https://www.vidking.net/embed/movie/${movie.id}`}
+      className="w-full h-full"
+      allow="autoplay; fullscreen"
+      allowFullScreen
+    />
+  </div>
+)}
     </div>
   );
 }
