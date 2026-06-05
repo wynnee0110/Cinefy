@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "https://cinefy-backend-l25h.onrender.com";
 
 
 export async function getPopularMovies() {
