@@ -1,5 +1,5 @@
-const API_URL = "https://cinefy-backend-l25h.onrender.com";
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getPopularMovies() {
   const response = await fetch(
