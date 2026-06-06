@@ -8,7 +8,6 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
       "https://cinefy-pi.vercel.app/",
     ],
   })
