@@ -1,7 +1,8 @@
 import { useState } from "react";
+import type { Movie } from "../types/movie";
 
 interface MoviePreviewCardProps {
-  movie: any;
+  movie: Movie;
   onPlay?: (id: number) => void;
   onMoreInfo?: (id: number) => void;
 }

@@ -3,13 +3,14 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchMovies } from "../services/movie.service";
 import MoviePreviewCard from "../components/MoviePreviewCard";
 import Header from "../components/Header";
+import type { Movie } from "../types/movie";
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = searchParams.get("q") || "";
 
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMovie } from "../services/movie.service";
+import type { MovieDetail, VideoResult } from "../types/movie";
 
 export default function MoviePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [movie, setMovie] = useState<any>(null);
+  const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showPlayer, setShowPlayer] = useState(false);
 
@@ -42,16 +43,16 @@ export default function MoviePage() {
   }, [id]);
 
   // Extract YouTube trailer key
-  const getTrailerKey = (movieDetail: any) => {
+  const getTrailerKey = (movieDetail: MovieDetail | null) => {
     if (!movieDetail?.videos?.results) return null;
     const videos = movieDetail.videos.results;
 
     const trailer = videos.find(
-      (vid: any) => vid.site === "YouTube" && vid.type === "Trailer"
+      (vid: VideoResult) => vid.site === "YouTube" && vid.type === "Trailer"
     );
     if (trailer) return trailer.key;
 
-    const clip = videos.find((vid: any) => vid.site === "YouTube");
+    const clip = videos.find((vid: VideoResult) => vid.site === "YouTube");
     if (clip) return clip.key;
 
     return null;
@@ -191,7 +192,7 @@ export default function MoviePage() {
               <div>
                 <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-3">Genres</h3>
                 <div className="flex flex-wrap gap-2">
-                  {movie.genres.map((g: any) => (
+                  {movie.genres.map((g) => (
                     <span
                       key={g.id}
                       className="bg-zinc-900 border border-zinc-800 text-zinc-300 px-4 py-1.5 rounded-full text-sm hover:border-zinc-600 transition"
@@ -208,7 +209,7 @@ export default function MoviePage() {
               <div>
                 <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-3">Production</h3>
                 <div className="flex flex-wrap gap-4">
-                  {movie.production_companies.map((company: any) => (
+                  {movie.production_companies.map((company) => (
                     <div
                       key={company.id}
                       className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2"
@@ -297,7 +298,7 @@ export default function MoviePage() {
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
                 <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Country</h3>
                 <span className="text-white">
-                  {movie.production_countries.map((c: any) => c.name).join(", ")}
+                  {movie.production_countries.map((c) => c.name).join(", ")}
                 </span>
               </div>
             )}
@@ -307,7 +308,7 @@ export default function MoviePage() {
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
                 <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Languages</h3>
                 <span className="text-white">
-                  {movie.spoken_languages.map((l: any) => l.english_name).join(", ")}
+                  {movie.spoken_languages.map((l) => l.english_name).join(", ")}
                 </span>
               </div>
             )}

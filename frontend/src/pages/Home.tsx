@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { getPopularMovies } from "../services/movie.service";
 import MovieRow from "../components/MovieRow";
 import Header from "../components/Header";
+import type { Movie } from "../types/movie";
 
 export default function Home() {
   const navigate = useNavigate();
 
-  const [movies, setMovies] = useState<any[]>([]);
-  const [featuredMovie, setFeaturedMovie] = useState<any>(null);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 

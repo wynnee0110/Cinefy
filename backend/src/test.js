@@ -5,7 +5,7 @@ async function testTMDB() {
     "https://api.themoviedb.org/3/movie/popular",
     {
       headers: {
-        Authorization: `Bearer ${process.env.TMDB_TOKEN}`,
+        Authorization: `Bearer ${process.env.TMDB_READ_TOKEN}`,
       },
     }
   );

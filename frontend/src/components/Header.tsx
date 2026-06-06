@@ -1,10 +1,17 @@
 import { useState } from "react";
+import type { NavigateFunction } from "react-router-dom";
+
+interface HeaderProps {
+  isScrolled: boolean;
+  navigate: NavigateFunction;
+  onSearch: (query: string) => void;
+}
 
 export default function Header({
   isScrolled,
   navigate,
   onSearch,
-}: any) {
+}: HeaderProps) {
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {

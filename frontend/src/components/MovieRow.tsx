@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect } from "react";
 import MoviePreviewCard from "./MoviePreviewCard";
+import type { Movie } from "../types/movie";
 
 interface MovieRowProps {
   title: string;
-  movies: any[];
+  movies: Movie[];
   onPlay: (id: number) => void;
   onMoreInfo: (id: number) => void;
 }
