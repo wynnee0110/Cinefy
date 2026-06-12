@@ -152,7 +152,7 @@ export default function MoviePage() {
           <div className="flex gap-4">
 <button
   onClick={() => setShowPlayer(true)}
-  className="bg-white text-black px-10 py-3.5 rounded-md font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
+  className="bg-white text-black px-5 py-0.5 rounded-full font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
 >
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 fill-current" viewBox="0 0 24 24">
     <path d="M8 5v14l11-7z" />

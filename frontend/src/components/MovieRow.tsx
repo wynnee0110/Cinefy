@@ -13,6 +13,9 @@ export default function MovieRow({ title, movies, onPlay, onMoreInfo }: MovieRow
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  
+  const isTrending =
+  title.toLowerCase().includes("trending");
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -82,13 +85,25 @@ export default function MovieRow({ title, movies, onPlay, onMoreInfo }: MovieRow
           className="flex gap-3 overflow-x-auto overflow-y-visible scroll-smooth scrollbar-hide py-2 pb-4"
         >
           {movies.map((movie, index) => (
-            <div key={`${title}-${movie.id}-${index}`} className="shrink-0">
-              <MoviePreviewCard
-                movie={movie}
-                onPlay={onPlay}
-                onMoreInfo={onMoreInfo}
-              />
-            </div>
+
+<div
+  key={`${title}-${movie.id}-${index}`}
+  className="relative shrink-0"
+>
+  {isTrending && index < 10 && (
+    <div className="absolute top-2 left-2 z-20">
+      <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
+        TOP #{index + 1}
+      </span>
+    </div>
+  )}
+
+  <MoviePreviewCard
+    movie={movie}
+    onPlay={onPlay}
+    onMoreInfo={onMoreInfo}
+  />
+</div>
           ))}
         </div>
       </div>

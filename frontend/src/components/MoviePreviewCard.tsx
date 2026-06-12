@@ -109,7 +109,7 @@ export default function MoviePreviewCard({
           <div className="p-4">
             <div className="flex gap-3 items-center mb-3">
               <span className="text-green-500 font-semibold">
-                {Math.round(movie.vote_average * 10)}% Match
+                {Math.round(movie.vote_average * 10)}% Rating
               </span>
 
               <span className="text-zinc-400">
