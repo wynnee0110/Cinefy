@@ -7,27 +7,26 @@ const headers = {
   accept: "application/json",
 };
 
-// TTL constants (in seconds)
 const TTL = {
-  POPULAR: 60 * 10,       // 10 minutes — changes often
-  MOVIE:   60 * 60 * 6,   // 6 hours   — movie details rarely change
-  SEARCH:  60 * 5,        // 5 minutes
+  POPULAR:  60 * 10,      // 10 minutes
+  DETAIL:   60 * 60 * 6,  // 6 hours
+  SEARCH:   60 * 5,       // 5 minutes
   TRENDING: 60 * 15,      // 15 minutes
-  GENRES:  60 * 60 * 24,  // 24 hours  — genres are static
+  GENRES:   60 * 60 * 24, // 24 hours
 };
 
 exports.getPopular = async () => {
-  return getOrSetCache("movies:popular", TTL.POPULAR, async () => {
-    const response = await fetch(`${BASE_URL}/movie/popular`, { headers });
+  return getOrSetCache("tv:popular", TTL.POPULAR, async () => {
+    const response = await fetch(`${BASE_URL}/tv/popular`, { headers });
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
     return response.json();
   });
 };
 
 exports.getTrending = async (timeWindow = "week") => {
-  return getOrSetCache(`movies:trending:${timeWindow}`, TTL.TRENDING, async () => {
+  return getOrSetCache(`tv:trending:${timeWindow}`, TTL.TRENDING, async () => {
     const response = await fetch(
-      `${BASE_URL}/trending/movie/${timeWindow}`,
+      `${BASE_URL}/trending/tv/${timeWindow}`,
       { headers }
     );
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
@@ -36,33 +35,44 @@ exports.getTrending = async (timeWindow = "week") => {
 };
 
 exports.getTopRated = async () => {
-  return getOrSetCache("movies:top_rated", TTL.POPULAR, async () => {
-    const response = await fetch(`${BASE_URL}/movie/top_rated`, { headers });
+  return getOrSetCache("tv:top_rated", TTL.POPULAR, async () => {
+    const response = await fetch(`${BASE_URL}/tv/top_rated`, { headers });
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
     return response.json();
   });
 };
 
-exports.getUpcoming = async () => {
-  return getOrSetCache("movies:upcoming", TTL.POPULAR, async () => {
-    const response = await fetch(`${BASE_URL}/movie/upcoming`, { headers });
+exports.getAiringToday = async () => {
+  return getOrSetCache("tv:airing_today", TTL.POPULAR, async () => {
+    const response = await fetch(`${BASE_URL}/tv/airing_today`, { headers });
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
     return response.json();
   });
 };
 
-exports.getNowPlaying = async () => {
-  return getOrSetCache("movies:now_playing", TTL.POPULAR, async () => {
-    const response = await fetch(`${BASE_URL}/movie/now_playing`, { headers });
+exports.getOnTheAir = async () => {
+  return getOrSetCache("tv:on_the_air", TTL.POPULAR, async () => {
+    const response = await fetch(`${BASE_URL}/tv/on_the_air`, { headers });
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
     return response.json();
   });
 };
 
-exports.getMovie = async (id) => {
-  return getOrSetCache(`movies:detail:${id}`, TTL.MOVIE, async () => {
+exports.getShow = async (id) => {
+  return getOrSetCache(`tv:detail:${id}`, TTL.DETAIL, async () => {
     const response = await fetch(
-      `${BASE_URL}/movie/${id}?append_to_response=videos,credits,similar,recommendations`,
+      `${BASE_URL}/tv/${id}?append_to_response=videos,credits,similar,recommendations`,
+      { headers }
+    );
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+    return response.json();
+  });
+};
+
+exports.getSeason = async (id, seasonNumber) => {
+  return getOrSetCache(`tv:season:${id}:${seasonNumber}`, TTL.DETAIL, async () => {
+    const response = await fetch(
+      `${BASE_URL}/tv/${id}/season/${seasonNumber}`,
       { headers }
     );
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
@@ -71,20 +81,17 @@ exports.getMovie = async (id) => {
 };
 
 exports.getGenres = async () => {
-  return getOrSetCache("movies:genres", TTL.GENRES, async () => {
-    const response = await fetch(
-      `${BASE_URL}/genre/movie/list`,
-      { headers }
-    );
+  return getOrSetCache("tv:genres", TTL.GENRES, async () => {
+    const response = await fetch(`${BASE_URL}/genre/tv/list`, { headers });
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
     return response.json();
   });
 };
 
 exports.getByGenre = async (genreId, page = 1) => {
-  return getOrSetCache(`movies:genre:${genreId}:page:${page}`, TTL.POPULAR, async () => {
+  return getOrSetCache(`tv:genre:${genreId}:page:${page}`, TTL.POPULAR, async () => {
     const response = await fetch(
-      `${BASE_URL}/discover/movie?with_genres=${genreId}&page=${page}&sort_by=popularity.desc`,
+      `${BASE_URL}/discover/tv?with_genres=${genreId}&page=${page}&sort_by=popularity.desc`,
       { headers }
     );
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
@@ -97,10 +104,10 @@ exports.search = async (query, page = 1) => {
     return { page: 1, results: [], total_pages: 1, total_results: 0 };
   }
 
-  const cacheKey = `movies:search:${encodeURIComponent(query.trim())}:page:${page}`;
+  const cacheKey = `tv:search:${encodeURIComponent(query.trim())}:page:${page}`;
   return getOrSetCache(cacheKey, TTL.SEARCH, async () => {
     const response = await fetch(
-      `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=${page}`,
+      `${BASE_URL}/search/tv?query=${encodeURIComponent(query)}&page=${page}`,
       { headers }
     );
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
