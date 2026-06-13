@@ -45,7 +45,6 @@ export default function Home() {
   const [moviesRow1, setMoviesRow1] = useState<Movie[]>([]);
   const [moviesRow2, setMoviesRow2] = useState<Movie[]>([]);
   const [moviesRow3, setMoviesRow3] = useState<Movie[]>([]);
-  const [genreGridItems, setGenreGridItems] = useState<Movie[]>([]);
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,20 +64,48 @@ export default function Home() {
       setIsLoading(true);
       try {
         if (selectedGenreId) {
-          // Genre-specific grid view
-          let data;
-          if (contentType === "tv") {
-            data = await getTvByGenre(selectedGenreId);
-          } else {
-            data = await getMoviesByGenre(selectedGenreId);
-          }
-          const results = data.results || [];
-          setGenreGridItems(results);
+          // Fetch pages 1 and 2 in parallel for a richer selection
+          const [page1, page2] = await Promise.all([
+            contentType === "tv"
+              ? getTvByGenre(selectedGenreId, 1)
+              : getMoviesByGenre(selectedGenreId, 1),
+            contentType === "tv"
+              ? getTvByGenre(selectedGenreId, 2)
+              : getMoviesByGenre(selectedGenreId, 2),
+          ]);
 
-          if (results.length > 0) {
-            // Select a random result from this genre for the featured hero banner
-            setFeaturedMovie(results[Math.floor(Math.random() * results.length)]);
+          const p1Results = page1.results || [];
+          const p2Results = page2.results || [];
+          const allResults = [...p1Results, ...p2Results];
+
+          if (allResults.length > 0) {
+            // Row 1: Popular in this genre (default TMDB order)
+            setMoviesRow1(p1Results);
+
+            // Row 2: Critically Acclaimed (sorted by rating descending)
+            const topRated = allResults
+              .slice()
+              .sort((a, b) => b.vote_average - a.vote_average)
+              .slice(0, 20);
+            setMoviesRow2(topRated);
+
+            // Row 3: New & Upcoming (sorted by date descending)
+            const getReleaseTime = (item: any) => {
+              const dateStr = item.release_date || item.first_air_date || "";
+              return dateStr ? new Date(dateStr).getTime() : 0;
+            };
+            const newReleases = allResults
+              .slice()
+              .sort((a, b) => getReleaseTime(b) - getReleaseTime(a))
+              .slice(0, 20);
+            setMoviesRow3(newReleases);
+
+            // Featured Hero Movie (random choice from first page)
+            setFeaturedMovie(p1Results[Math.floor(Math.random() * p1Results.length)]);
           } else {
+            setMoviesRow1([]);
+            setMoviesRow2([]);
+            setMoviesRow3([]);
             setFeaturedMovie(null);
           }
         } else if (contentType === "tv") {
@@ -275,30 +302,35 @@ export default function Home() {
       {/* Main Browse Catalog */}
       <div className="relative z-20 pb-20 -mt-18 md:mt-18 space-y-10 md:space-y-14">
         {selectedGenreId ? (
-          /* Genre Grid View */
-          <section className="px-6 md:px-12 pt-8">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-8 tracking-wide">
-              {currentGenreName} {contentType === "tv" ? "TV Shows" : "Movies"}
-            </h2>
-
-            {genreGridItems.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                {genreGridItems.map((item, index) => (
-                  <div key={`${item.id}-${index}`} className="relative group">
-                    <MoviePreviewCard
-                      movie={item}
-                      onPlay={handleSelectMovie}
-                      onMoreInfo={handleSelectMovie}
-                    />
-                  </div>
-                ))}
-              </div>
+          /* Genre Rows View */
+          <>
+            {moviesRow1.length > 0 ? (
+              <>
+                <MovieRow
+                  title={`Popular ${currentGenreName} ${contentType === "tv" ? "TV Shows" : "Movies"}`}
+                  movies={moviesRow1}
+                  onPlay={handleSelectMovie}
+                  onMoreInfo={handleSelectMovie}
+                />
+                <MovieRow
+                  title="Critically Acclaimed"
+                  movies={moviesRow2}
+                  onPlay={handleSelectMovie}
+                  onMoreInfo={handleSelectMovie}
+                />
+                <MovieRow
+                  title="New & Upcoming"
+                  movies={moviesRow3}
+                  onPlay={handleSelectMovie}
+                  onMoreInfo={handleSelectMovie}
+                />
+              </>
             ) : (
               <div className="text-center py-20 text-zinc-500 text-lg">
                 No items found for this genre.
               </div>
             )}
-          </section>
+          </>
         ) : contentType === "tv" ? (
           /* TV Shows Rows */
           <>
