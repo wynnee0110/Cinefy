@@ -3,8 +3,8 @@ import type { Movie } from "../types/movie";
 
 interface MoviePreviewCardProps {
   movie: Movie;
-  onPlay?: (id: number) => void;
-  onMoreInfo?: (id: number) => void;
+  onPlay?: (id: number, mediaType: "movie" | "tv") => void;
+  onMoreInfo?: (id: number, mediaType: "movie" | "tv") => void;
 }
 
 export default function MoviePreviewCard({
@@ -13,6 +13,11 @@ export default function MoviePreviewCard({
   onMoreInfo,
 }: MoviePreviewCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  const isTv = !movie.title && !!(movie as any).name;
+  const title = movie.title || (movie as any).name || "Untitled";
+  const releaseDate = movie.release_date || (movie as any).first_air_date || "";
+  const mediaType = isTv ? "tv" : "movie";
 
   return (
     <div
@@ -23,7 +28,7 @@ export default function MoviePreviewCard({
       {/* Poster */}
       <img
         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
+        alt={title}
         className={`
           w-[320px] h-[400px] object-cover rounded-md
           transition-all duration-300 cursor-pointer
@@ -50,7 +55,7 @@ export default function MoviePreviewCard({
           <div className="relative h-[240px]">
             <img
               src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`}
-              alt={movie.title}
+              alt={title}
               className="w-full h-full object-cover"
             />
 
@@ -59,12 +64,12 @@ export default function MoviePreviewCard({
             {/* Movie Title */}
             <div className="absolute bottom-6 left-6 right-6">
               <h2 className="text-3xl font-black text-white drop-shadow-lg truncate">
-                {movie.title}
+                {title}
               </h2>
 
               <div className="flex gap-2 mt-4">
                 <button
-                  onClick={() => onPlay?.(movie.id)}
+                  onClick={() => onPlay?.(movie.id, mediaType)}
                   className="
                     bg-white
                     text-black
@@ -85,7 +90,7 @@ export default function MoviePreviewCard({
                    Play
                 </button>
                 <button
-                  onClick={() => onMoreInfo?.(movie.id)}
+                  onClick={() => onMoreInfo?.(movie.id, mediaType)}
                   className="
                     bg-zinc-700/80
                     text-white
@@ -113,7 +118,7 @@ export default function MoviePreviewCard({
               </span>
 
               <span className="text-zinc-400">
-                {movie.release_date?.split("-")[0]}
+                {releaseDate?.split("-")[0]}
               </span>
             </div>
 

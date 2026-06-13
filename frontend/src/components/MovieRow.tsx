@@ -5,8 +5,8 @@ import type { Movie } from "../types/movie";
 interface MovieRowProps {
   title: string;
   movies: Movie[];
-  onPlay: (id: number) => void;
-  onMoreInfo: (id: number) => void;
+  onPlay: (id: number, mediaType: "movie" | "tv") => void;
+  onMoreInfo: (id: number, mediaType: "movie" | "tv") => void;
 }
 
 export default function MovieRow({ title, movies, onPlay, onMoreInfo }: MovieRowProps) {
