@@ -10,7 +10,7 @@ import {
 } from "../services/movie.service";
 import MovieRow from "../components/MovieRow";
 import Header from "../components/Header";
-import MoviePreviewCard from "../components/MoviePreviewCard";
+
 import type { Movie } from "../types/movie";
 
 const GENRES = [
