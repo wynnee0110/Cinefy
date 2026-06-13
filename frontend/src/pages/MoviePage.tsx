@@ -329,9 +329,9 @@ export default function MoviePage() {
 
     {/* VidKing FULL VIDEO */}
     <iframe
-      src={`https://vidking.net/embed/movie/${movie.id}`}
+      src={`https://www.vidking.net/embed/movie/${movie.id}`}
       className="w-full h-full"
-      allow="autoplay; fullscreen"
+      allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
       allowFullScreen
     />
   </div>

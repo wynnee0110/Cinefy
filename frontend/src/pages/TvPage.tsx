@@ -355,9 +355,9 @@ export default function TvPage() {
 
           {/* TV Show Embed */}
           <iframe
-            src={`https://vidking.net/embed/tv/${show.id}/${activeEpisode.season}/${activeEpisode.episode}`}
+            src={`https://www.vidking.net/embed/tv/${show.id}/${activeEpisode.season}/${activeEpisode.episode}`}
             className="w-full h-full"
-            allow="autoplay; fullscreen"
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
             allowFullScreen
           />
         </div>
