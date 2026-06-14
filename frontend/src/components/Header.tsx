@@ -61,7 +61,7 @@ export default function Header({
         <div className="flex-1 md:flex-none flex items-center justify-start">
 <div onClick={() => navigate("/")} className="cursor-pointer">
   <img
-    src="/logo2.png"
+    src="/logo.png"
     alt="Cinefy Logo"
     className="h-10 w-auto"
   />
@@ -71,7 +71,7 @@ export default function Header({
             className="
               text-red-600
               text-2xl
-              md:text-4xl
+              md:text-4xlj
               font-black
               tracking-tighter
               cursor-pointer
