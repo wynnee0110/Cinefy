@@ -59,6 +59,14 @@ export default function Header({
       <div className="flex items-center justify-between relative">
         {/* Left Side: Logo & Desktop Navigation */}
         <div className="flex-1 md:flex-none flex items-center justify-start">
+<div onClick={() => navigate("/")} className="cursor-pointer">
+  <img
+    src="/logo2.png"
+    alt="Cinefy Logo"
+    className="h-10 w-auto"
+  />
+</div>
+
           <h1
             className="
               text-red-600
@@ -69,6 +77,7 @@ export default function Header({
               cursor-pointer
               hover:text-red-500
               transition
+              gap-2
             "
             onClick={() => navigate("/")}
           >
