@@ -7,6 +7,7 @@ const movieRoutes = require("./modules/movies/movie.routes");
 const tvRoutes = require("./modules/tv/tv.routes");
 
 const app = express();
+console.log(arcjet);
 
 // Arcjet configuration
 const aj = arcjet({
