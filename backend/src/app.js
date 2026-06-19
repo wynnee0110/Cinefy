@@ -1,34 +1,37 @@
 const express = require("express");
 const cors = require("cors");
-const arcjet = require("@arcjet/node");
+const {
+  default: arcjet,
+  shield,
+  detectBot,
+  tokenBucket,
+} = require("@arcjet/node");
 
 const errorHandler = require("./middleware/errorHandler");
 const movieRoutes = require("./modules/movies/movie.routes");
 const tvRoutes = require("./modules/tv/tv.routes");
 
 const app = express();
-console.log(arcjet);
 
 // Arcjet configuration
 const aj = arcjet({
   key: process.env.ARCJET_KEY,
-rules: [
-  arcjet.shield({
-    mode: "LIVE",
-  }),
-  arcjet.detectBot({
-    mode: "LIVE",
-    allow: ["CATEGORY:SEARCH_ENGINE"],
-  }),
-  arcjet.tokenBucket({
-    mode: "LIVE",
-    refillRate: 10,
-    interval: 60,
-    capacity: 20,
-  }),
-],
+  rules: [
+    shield({
+      mode: "LIVE",
+    }),
+    detectBot({
+      mode: "LIVE",
+      allow: ["CATEGORY:SEARCH_ENGINE"],
+    }),
+    tokenBucket({
+      mode: "LIVE",
+      refillRate: 10,
+      interval: 60,
+      capacity: 20,
+    }),
+  ],
 });
-
 // Arcjet middleware
 app.use(async (req, res, next) => {
   const decision = await aj.protect(req);
