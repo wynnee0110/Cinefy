@@ -34,6 +34,12 @@ const aj = arcjet({
     }),
   ],
 });
+
+app.use((req, res, next) => {
+  console.log("req.ip =", req.ip);
+  console.log("x-forwarded-for =", req.headers["x-forwarded-for"]);
+  next();
+});
 // Arcjet middleware
 app.use(async (req, res, next) => {
   try {
