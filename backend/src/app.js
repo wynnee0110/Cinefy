@@ -1,4 +1,5 @@
 const express = require("express");
+
 const cors = require("cors");
 const {
   default: arcjet,
@@ -13,6 +14,7 @@ const tvRoutes = require("./modules/tv/tv.routes");
 
 const app = express();
 
+app.set("trust proxy", true);
 // Arcjet configuration
 const aj = arcjet({
   key: process.env.ARCJET_KEY,
@@ -24,25 +26,33 @@ const aj = arcjet({
       mode: "LIVE",
       allow: ["CATEGORY:SEARCH_ENGINE"],
     }),
-    tokenBucket({
-      mode: "LIVE",
-      refillRate: 10,
-      interval: 60,
-      capacity: 20,
-    }),
+tokenBucket({
+  mode: "LIVE",
+  refillRate: 10,
+  interval: 60,
+  capacity: 20,
+  requested: 1,
+})
   ],
 });
 // Arcjet middleware
 app.use(async (req, res, next) => {
-  const decision = await aj.protect(req);
+  try {
+    const decision = await aj.protect(req);
 
-  if (decision.isDenied()) {
-    return res.status(429).json({
-      error: "Request blocked",
-    });
+    if (decision.isDenied()) {
+      return res.status(429).json({
+        error: "Request blocked",
+      });
+    }
+
+    next();
+  } catch (err) {
+    console.error("Arcjet error:", err);
+
+    // Fail open so your API still works
+    next();
   }
-
-  next();
 });
 
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
