@@ -11,19 +11,21 @@ const app = express();
 // Arcjet configuration
 const aj = arcjet({
   key: process.env.ARCJET_KEY,
-  rules: [
-    arcjet.shield(),
-    arcjet.detectBot({
-      mode: "LIVE",
-      allow: ["CATEGORY:SEARCH_ENGINE"],
-    }),
-    arcjet.tokenBucket({
-      mode: "LIVE",
-      refillRate: 10,
-      interval: 60,
-      capacity: 20,
-    }),
-  ],
+rules: [
+  arcjet.shield({
+    mode: "LIVE",
+  }),
+  arcjet.detectBot({
+    mode: "LIVE",
+    allow: ["CATEGORY:SEARCH_ENGINE"],
+  }),
+  arcjet.tokenBucket({
+    mode: "LIVE",
+    refillRate: 10,
+    interval: 60,
+    capacity: 20,
+  }),
+],
 });
 
 // Arcjet middleware
