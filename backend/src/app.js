@@ -26,31 +26,30 @@ const aj = arcjet({
       mode: "LIVE",
       allow: ["CATEGORY:SEARCH_ENGINE"],
     }),
-tokenBucket({
-  mode: "LIVE",
-  refillRate: 10,
-  interval: 60,
-  capacity: 20,
-  requested: 1,
-})
+    tokenBucket({
+      mode: "LIVE",
+      refillRate: 10,
+      interval: 60,
+      capacity: 20,
+    }),
   ],
 });
 // Arcjet middleware
 app.use(async (req, res, next) => {
   try {
-    const decision = await aj.protect(req);
+    const decision = await aj.protect(req, {
+      requested: 1,
+    });
 
     if (decision.isDenied()) {
       return res.status(429).json({
-        error: "Request blocked",
+        error: "Too many requests, please try again later",
       });
     }
 
     next();
   } catch (err) {
     console.error("Arcjet error:", err);
-
-    // Fail open so your API still works
     next();
   }
 });
