@@ -32,8 +32,6 @@ const GENRES = [
   { id: 53, name: "Thriller" },
 ];
 
-
-
 export default function Home() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,10 +51,13 @@ export default function Home() {
 
   // Genre infinite scroll state
   const [allGenreMovies, setAllGenreMovies] = useState<Movie[]>([]);
-  const [genrePage, setGenrePage] = useState(3); // starts at 3 since initial load fetches pages 1-2
+  const [genrePage, setGenrePage] = useState(3);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMoreGenrePages, setHasMoreGenrePages] = useState(true);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  
+  // Refs for preventing race conditions
+  const isLoadingRef = useRef(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Scroll handler for navbar transparent/solid transition
   useEffect(() => {
@@ -71,13 +72,13 @@ export default function Home() {
   useEffect(() => {
     async function loadContent() {
       setIsLoading(true);
-      // Reset genre pagination when genre/type changes
       setGenrePage(3);
       setHasMoreGenrePages(true);
+      setAllGenreMovies([]);
 
       try {
         if (selectedGenreId) {
-          // Fetch pages 1 and 2 in parallel for a richer selection
+          // Fetch pages 1 and 2 in parallel
           const [page1, page2] = await Promise.all([
             contentType === "tv"
               ? getTvByGenre(selectedGenreId, 1)
@@ -98,27 +99,22 @@ export default function Home() {
           setHasMoreGenrePages(totalPages > 2);
 
           if (allResults.length > 0) {
-            // Row 1: Popular in this genre (default TMDB order)
             setMoviesRow1(p1Results);
 
-            // Row 2: Critically Acclaimed (sorted by rating descending)
             const topRated = allResults
               .slice()
               .sort((a, b) => b.vote_average - a.vote_average)
               .slice(0, 20);
             setMoviesRow2(topRated);
 
-            // Featured Hero Movie (random choice from first page)
             setFeaturedMovie(p1Results[Math.floor(Math.random() * p1Results.length)]);
           } else {
             setMoviesRow1([]);
             setMoviesRow2([]);
             setMoviesRow3([]);
-            setAllGenreMovies([]);
             setFeaturedMovie(null);
           }
         } else if (contentType === "tv") {
-          // TV Shows view
           const [popularData, trendingData] = await Promise.all([
             getPopularTv(),
             getTrendingTv(),
@@ -135,7 +131,6 @@ export default function Home() {
             setFeaturedMovie(trending[Math.floor(Math.random() * trending.length)]);
           }
         } else if (contentType === "movies") {
-          // Movies view
           const [popularData, trendingData] = await Promise.all([
             getPopularMovies(),
             getTrendingMovies(),
@@ -152,7 +147,6 @@ export default function Home() {
             setFeaturedMovie(trending[Math.floor(Math.random() * trending.length)]);
           }
         } else {
-          // Default Home view (Mixed)
           const [popularMoviesData, trendingMoviesData, popularTvData] = await Promise.all([
             getPopularMovies(),
             getTrendingMovies(),
@@ -164,7 +158,7 @@ export default function Home() {
           const popularTv = popularTvData.results || [];
 
           setMoviesRow1(trendingMovies);
-          setMoviesRow2(popularTv); // Showcase TV shows on homepage row 2
+          setMoviesRow2(popularTv);
           setMoviesRow3(popularMovies.slice(5, 15));
 
           if (trendingMovies.length > 0) {
@@ -181,71 +175,85 @@ export default function Home() {
     loadContent();
   }, [contentType, selectedGenreId]);
 
-  // Infinite scroll: load more genre movies
+  // Load more genre movies - use genrePage from closure, calculate nextPage correctly
   const loadMoreGenreMovies = useCallback(async () => {
-    if (!selectedGenreId || isLoadingMore || !hasMoreGenrePages) return;
-console.log("Loading page:", genrePage);
+    // Prevent simultaneous requests
+    if (isLoadingRef.current || !selectedGenreId || !hasMoreGenrePages) return;
+
+    isLoadingRef.current = true;
     setIsLoadingMore(true);
+
     try {
       const data = contentType === "tv"
         ? await getTvByGenre(selectedGenreId, genrePage)
         : await getMoviesByGenre(selectedGenreId, genrePage);
 
       const newResults = data.results || [];
+
       if (newResults.length === 0) {
         setHasMoreGenrePages(false);
       } else {
+        // Add new movies with deduplication
         setAllGenreMovies((prev) => {
-          // Deduplicate by id
           const existingIds = new Set(prev.map((m) => m.id));
           const unique = newResults.filter((m: Movie) => !existingIds.has(m.id));
           return [...prev, ...unique];
         });
-        setGenrePage((prev) => prev + 1);
 
-        // Check if we've reached the last page
+        // Calculate next page and check if we've reached the end
         const totalPages = data.total_pages || 1;
-        if (genrePage >= totalPages) {
+        const nextPage = genrePage + 1;
+
+        // Update page number
+        setGenrePage(nextPage);
+
+        // Stop if we've reached the last page
+        if (nextPage >= totalPages) {
           setHasMoreGenrePages(false);
         }
       }
     } catch (error) {
       console.error("Failed to load more genre movies:", error);
+      setHasMoreGenrePages(false);
     } finally {
+      isLoadingRef.current = false;
       setIsLoadingMore(false);
     }
-  }, [selectedGenreId, genrePage, isLoadingMore, hasMoreGenrePages, contentType]);
+  }, [selectedGenreId, genrePage, hasMoreGenrePages, contentType]);
 
-  // IntersectionObserver for infinite scroll trigger
-  useEffect(() => {
-    if (!selectedGenreId || !hasMoreGenrePages) return;
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      observerRef.current?.disconnect();
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          console.log("Observer triggered");
-          loadMoreGenreMovies();
+      if (!node || !selectedGenreId || !hasMoreGenrePages) return;
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && !isLoadingRef.current) {
+            loadMoreGenreMovies();
+          }
+        },
+        {
+          root: null,
+          rootMargin: "800px 0px",
+          threshold: 0,
         }
-      },
-      {
-  root: null,
-  rootMargin: "1000px",
-  threshold: 0
-}
-    );
+      );
 
-    const el = loadMoreRef.current;
-    if (el) observer.observe(el);
+      observerRef.current.observe(node);
+    },
+    [selectedGenreId, hasMoreGenrePages, loadMoreGenreMovies]
+  );
 
-return () => observer.disconnect();
-  }, [selectedGenreId, hasMoreGenrePages, loadMoreGenreMovies]);
+  useEffect(() => {
+    return () => observerRef.current?.disconnect();
+  }, []);
 
   // Actions
   const handleSelectMovie = (id: number, mediaType: "movie" | "tv") => {
     navigate(`/${mediaType === "tv" ? "tv" : "movies"}/${id}`);
   };
 
-  // Genre grid click handler — uses contentType directly instead of fragile title/name detection
   const handleGenreItemClick = (movie: Movie) => {
     const mediaType = contentType === "tv" ? "tv" : "movie";
     handleSelectMovie(movie.id, mediaType as "movie" | "tv");
@@ -264,22 +272,20 @@ return () => observer.disconnect();
   };
 
   const handleGenreSelect = (genreId: number) => {
-    // Keep current type if active, otherwise filter general movies by genre
     const newType = contentType !== "all" ? contentType : "movies";
     setSearchParams({ type: newType, genre: String(genreId) });
   };
 
-  // Find human-readable genre name
+  // Find genre name
   const currentGenreName = GENRES.find((g) => g.id === selectedGenreId)?.name || "";
 
-  // Helper values for background details mapping
+  // Featured movie details
   const featuredTitle = featuredMovie ? (featuredMovie.title || (featuredMovie as any).name) : "";
   const featuredOverview = featuredMovie?.overview?.trim() || "No overview available.";
 
   if (isLoading) {
     return (
       <div className="bg-black min-h-screen text-white overflow-x-hidden">
-        {/* Header */}
         <Header
           isScrolled={isScrolled}
           navigate={navigate}
@@ -289,7 +295,6 @@ return () => observer.disconnect();
           onGenreSelect={handleGenreSelect}
         />
 
-        {/* Hero Skeleton */}
         <div className="relative h-[85vh] md:h-[90vh] bg-zinc-900 animate-pulse">
           <div className="absolute bottom-24 md:bottom-14 left-6 md:left-12 max-w-2xl z-10 space-y-4">
             <div className="h-12 w-96 bg-zinc-800 rounded-lg" />
@@ -302,7 +307,6 @@ return () => observer.disconnect();
           </div>
         </div>
 
-        {/* Row Skeletons */}
         <div className="space-y-10 md:space-y-14 px-6 md:px-12 py-10">
           {[1, 2, 3].map((i) => (
             <div key={i}>
@@ -315,14 +319,12 @@ return () => observer.disconnect();
             </div>
           ))}
         </div>
-        
       </div>
     );
   }
 
   return (
     <div className="bg-black min-h-screen text-white overflow-x-hidden selection:bg-red-600 selection:text-white">
-      {/* Header */}
       <Header
         isScrolled={isScrolled}
         navigate={navigate}
@@ -332,7 +334,6 @@ return () => observer.disconnect();
         onGenreSelect={handleGenreSelect}
       />
 
-      {/* Hero Section */}
       {featuredMovie && (
         <section
           className="relative h-[85vh] md:h-[90vh] bg-cover bg-center"
@@ -343,9 +344,7 @@ return () => observer.disconnect();
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-          {/* Hero Content */}
           <div className="absolute bottom-24 md:bottom-14 left-6 md:left-12 max-w-2xl z-10">
-            {/* Show Category Chip */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-6 drop-shadow-2xl">
               {featuredTitle}
             </h1>
@@ -409,14 +408,11 @@ return () => observer.disconnect();
         </section>
       )}
 
-      {/* Main Browse Catalog */}
       <div className="relative z-20 pb-20 -mt-18 md:mt-18 space-y-10 md:space-y-14">
         {selectedGenreId ? (
-          /* Genre View */
           <>
             {allGenreMovies.length > 0 ? (
               <>
-                {/* Horizontal scroll rows */}
                 <MovieRow
                   title={`Popular ${currentGenreName} ${contentType === "tv" ? "TV Shows" : "Movies"}`}
                   movies={moviesRow1}
@@ -430,7 +426,6 @@ return () => observer.disconnect();
                   onMoreInfo={handleSelectMovie}
                 />
 
-                {/* All Genre Movies — Infinite Scroll Grid */}
                 <div className="px-6 md:px-12 mt-10">
                   <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-wide">
                     All {currentGenreName} {contentType === "tv" ? "TV Shows" : "Movies"}
@@ -474,10 +469,17 @@ return () => observer.disconnect();
                     ))}
                   </div>
 
-                  {/* Infinite scroll trigger */}
-                  <div ref={loadMoreRef} className="py-10 flex justify-center">
+                  <div ref={loadMoreRef} className="h-32 flex justify-center items-center">
                     {isLoadingMore && (
                       <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+                    )}
+                    {!isLoadingMore && hasMoreGenrePages && (
+                      <button
+                        onClick={loadMoreGenreMovies}
+                        className="bg-zinc-800 text-white px-5 py-2 rounded-full font-semibold hover:bg-zinc-700 transition"
+                      >
+                        Load more
+                      </button>
                     )}
                     {!hasMoreGenrePages && allGenreMovies.length > 0 && (
                       <p className="text-zinc-600 text-sm">No more results</p>
@@ -492,7 +494,6 @@ return () => observer.disconnect();
             )}
           </>
         ) : contentType === "tv" ? (
-          /* TV Shows Rows */
           <>
             <MovieRow
               title="Trending TV Shows"
@@ -514,7 +515,6 @@ return () => observer.disconnect();
             />
           </>
         ) : contentType === "movies" ? (
-          /* Movies Rows */
           <>
             <MovieRow
               title="Trending Movies"
@@ -536,7 +536,6 @@ return () => observer.disconnect();
             />
           </>
         ) : (
-          /* Default Mixed View */
           <>
             <MovieRow
               title="Trending Now"
