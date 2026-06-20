@@ -5,7 +5,6 @@ interface HeaderProps {
   isScrolled: boolean;
   navigate: NavigateFunction;
   onSearch: (query: string) => void;
-
   onMovieClick?: () => void;
   onTvClick?: () => void;
   onGenreSelect?: (genreId: number) => void;
@@ -105,15 +104,36 @@ export default function Header({
             </button>
 
         <div className="relative">
-  <button
-    onClick={() => setIsGenreOpen(!isGenreOpen)}
-    className="text-white hover:text-red-500 transition"
+<button
+  onClick={() => setIsGenreOpen(!isGenreOpen)}
+  className="flex items-center gap-2 text-white hover:text-red-500 transition"
+>
+  {selectedGenreId
+    ? genres.find((g) => g.id === selectedGenreId)?.name
+    : "Genres"}
+
+  <span
+    className={`inline-block transition-transform duration-300 ${
+      isGenreOpen ? "rotate-180" : "rotate-0"
+    }`}
   >
-    {selectedGenreId
-      ? genres.find((g) => g.id === selectedGenreId)?.name
-      : "Genres"}{" "}
-    {/* ARROW IICON TO BE ADDED */}
-  </button>
+<svg
+  className="w-4 h-4"
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M18 15L12 9L6 15"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />
+</svg>
+  </span>
+  
+</button>
 
   {isGenreOpen && (
     <div

@@ -10,6 +10,7 @@ export default function MoviePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPlayer, setShowPlayer] = useState(false);
   const [error, setError] = useState("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -31,9 +32,29 @@ export default function MoviePage() {
     async function loadMovie() {
       setIsLoading(true);
       setError("");
+      
       try {
         const data = await getMovie(Number(id));
         setMovie(data);
+          try {
+  const res = await fetch(
+    `http://localhost:5000/movies/${id}/images`
+  );
+
+  const images = await res.json();
+
+  const logo =
+    images.logos?.find((l: any) => l.iso_639_1 === "en") ||
+    images.logos?.[0];
+
+  if (logo) {
+    setLogoUrl(
+      `https://image.tmdb.org/t/p/w500${logo.file_path}`
+    );
+  }
+} catch (err) {
+  console.error("Failed to load logo", err);
+}
       } catch (error) {
         console.error("Failed to load movie:", error);
         setMovie(null);
@@ -132,7 +153,7 @@ export default function MoviePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30" />
 
         {/* Hero Content */}
-        <div className="absolute bottom-24 left-12 right-12 md:left-16 md:right-auto max-w-2xl z-10">
+        <div className="absolute bottom-12 left-12 right-12 md:left-16 md:right-auto max-w-xl z-10">
           {/* Metadata chips */}
           <div className="flex flex-wrap items-center gap-3 text-sm font-semibold mb-4">
             {movie.vote_average > 0 && (
@@ -153,9 +174,17 @@ export default function MoviePage() {
             </span>
           </div>
 
-          <h1 className="text-7xl font-black mb-5 drop-shadow-xl leading-none">
-            {movie.title}
-          </h1>
+{logoUrl ? (
+  <img
+    src={logoUrl}
+    alt={movie.title}
+    className="max-w-[600px] max-h-[220px] object-contain mb-5"
+  />
+) : (
+  <h1 className="text-7xl font-black mb-5 drop-shadow-xl leading-none">
+    {movie.title}
+  </h1>
+)}
 
           {movie.tagline && (
             <p className="italic text-zinc-400 text-base mb-5 border-l-3 border-red-600 pl-4">
@@ -163,7 +192,7 @@ export default function MoviePage() {
             </p>
           )}
 
-          <p className="text-zinc-300 text-lg mb-8 leading-relaxed line-clamp-3 max-w-xl">
+          <p className="text-zinc-300 text-md mb-8 leading-relaxed line-clamp-3 max-w-xl">
             {movie.overview || "No overview available."}
           </p>
 

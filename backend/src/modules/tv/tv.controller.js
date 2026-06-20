@@ -1,5 +1,6 @@
 const tvService = require("./tv.service");
 
+
 exports.getPopular = async (req, res) => {
   try {
     const data = await tvService.getPopular();
@@ -89,6 +90,15 @@ exports.search = async (req, res) => {
   try {
     const { q, page = 1 } = req.query;
     const data = await tvService.search(q, page);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getImages = async (req, res) => {  
+  try {
+    const data = await tvService.getImages(req.params.id);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });

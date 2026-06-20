@@ -148,3 +148,11 @@ exports.search = async (query, page = 1) => {
     return withResultsOverviewFallback(await response.json());
   });
 };
+
+exports.getImages = async (id) => {
+  return getOrSetCache(`tv:images:${id}`, TTL.DETAIL, async () => {
+    const response = await fetch(`${BASE_URL}/tv/${id}/images`, { headers });
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+    return response.json();
+  });
+};

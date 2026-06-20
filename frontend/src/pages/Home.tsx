@@ -349,7 +349,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
           <div className="absolute bottom-24 md:bottom-14 left-6 md:left-12 max-w-2xl z-10">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-6 drop-shadow-2xl">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 md:mb-6 drop-shadow-2xl line-clamp-2">
               {featuredTitle}
             </h1>
 

@@ -52,6 +52,8 @@ export default function TvPage() {
   const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
   const [activeEpisode, setActiveEpisode] = useState<{ season: number; episode: number } | null>(null);
   const [error, setError] = useState("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (activeEpisode) {
@@ -63,6 +65,35 @@ export default function TvPage() {
       document.body.style.overflow = "auto";
     };
   }, [activeEpisode]);
+
+
+
+
+  useEffect(() => {
+  async function loadLogo() {
+    if (!id) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/tv/${id}/images`);
+      const images = await res.json();
+
+      const logo =
+        images.logos?.find((l: any) => l.iso_639_1 === "en") ||
+        images.logos?.find((l: any) => l.iso_639_1 === null) ||
+        images.logos?.[0];
+
+      if (logo?.file_path) {
+        setLogoUrl(`https://image.tmdb.org/t/p/w500${logo.file_path}`);
+      }
+    } catch (err) {
+      console.error("Failed to load TV logo:", err);
+    }
+  }
+
+  loadLogo();
+}, [id]);
+
+
 
   // Load main TV show details
   useEffect(() => {
@@ -155,7 +186,7 @@ export default function TvPage() {
       </nav>
 
       {/* Full-Screen Hero */}
-      <section className="relative h-[80vh] w-full overflow-hidden">
+      <section className="relative h-screen w-full overflow-hidden">
         <img
           src={`https://image.tmdb.org/t/p/w1280${show.backdrop_path || show.poster_path}`}
           alt={show.name}
@@ -167,7 +198,7 @@ export default function TvPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30" />
 
         {/* Hero Content */}
-        <div className="absolute bottom-20 left-12 right-12 md:left-16 md:right-auto max-w-2xl z-10">
+        <div className="absolute bottom-12 left-12 right-12 md:left-16 md:right-auto max-w-2xl z-10">
           {/* Metadata chips */}
           <div className="flex flex-wrap items-center gap-3 text-sm font-semibold mb-4">
             {show.vote_average > 0 && (
@@ -186,9 +217,19 @@ export default function TvPage() {
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black mb-5 drop-shadow-xl leading-none">
-            {show.name}
-          </h1>
+<div className="mb-4">
+  {logoUrl ? (
+    <img
+      src={logoUrl}
+      alt={show.name}
+      className="max-h-[140px] max-w-[420px] object-contain"
+    />
+  ) : (
+    <h1 className="text-6xl md:text-7xl font-black leading-none">
+      {show.name}
+    </h1>
+  )}
+</div>
 
           {show.tagline && (
             <p className="italic text-zinc-400 text-base mb-5 border-l-3 border-red-600 pl-4">
@@ -227,7 +268,7 @@ export default function TvPage() {
       </section>
 
       {/* Episodes Picker Section */}
-      <section id="episodes-section" className="max-w-7xl mx-auto px-10 md:px-16 py-12 border-t border-zinc-900">
+      <section id="episodes-section" className="max-w-7xl mx-auto px-10 md:px-16 py-18 border-t border-zinc-900">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <h2 className="text-3xl font-bold">Episodes</h2>
 

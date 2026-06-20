@@ -13,8 +13,12 @@ router.get("/on-the-air",          tvController.getOnTheAir);
 router.get("/genres",              tvController.getGenres);
 router.get("/search",              tvController.search);
 
+
+router.get("/:id/images",          tvController.getImages);
+
 // Genre-based discovery
 router.get("/genre/:genreId",      tvController.getByGenre);
+
 
 // Single show
 router.get("/:id",                 tvController.getShow);

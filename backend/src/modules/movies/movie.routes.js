@@ -16,7 +16,10 @@ router.get("/search",             movieController.search);
 // Genre-based discovery
 router.get("/genre/:genreId",     movieController.getByGenre);
 
+router.get("/:id/images",         movieController.getImages);
+
 // Single movie (must be last to avoid conflicts with named routes)
 router.get("/:id",                movieController.getMovie);
+
 
 module.exports = router;
