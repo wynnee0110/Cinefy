@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   getPopularMovies,
@@ -32,6 +32,8 @@ const GENRES = [
   { id: 53, name: "Thriller" },
 ];
 
+
+
 export default function Home() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,6 +51,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Genre infinite scroll state
+  const [allGenreMovies, setAllGenreMovies] = useState<Movie[]>([]);
+  const [genrePage, setGenrePage] = useState(3); // starts at 3 since initial load fetches pages 1-2
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreGenrePages, setHasMoreGenrePages] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   // Scroll handler for navbar transparent/solid transition
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +71,10 @@ export default function Home() {
   useEffect(() => {
     async function loadContent() {
       setIsLoading(true);
+      // Reset genre pagination when genre/type changes
+      setGenrePage(3);
+      setHasMoreGenrePages(true);
+
       try {
         if (selectedGenreId) {
           // Fetch pages 1 and 2 in parallel for a richer selection
@@ -78,6 +91,12 @@ export default function Home() {
           const p2Results = page2.results || [];
           const allResults = [...p1Results, ...p2Results];
 
+          setAllGenreMovies(allResults);
+
+          // Check if there are more pages
+          const totalPages = page1.total_pages || 1;
+          setHasMoreGenrePages(totalPages > 2);
+
           if (allResults.length > 0) {
             // Row 1: Popular in this genre (default TMDB order)
             setMoviesRow1(p1Results);
@@ -89,23 +108,13 @@ export default function Home() {
               .slice(0, 20);
             setMoviesRow2(topRated);
 
-            // Row 3: New & Upcoming (sorted by date descending)
-            const getReleaseTime = (item: any) => {
-              const dateStr = item.release_date || item.first_air_date || "";
-              return dateStr ? new Date(dateStr).getTime() : 0;
-            };
-            const newReleases = allResults
-              .slice()
-              .sort((a, b) => getReleaseTime(b) - getReleaseTime(a))
-              .slice(0, 20);
-            setMoviesRow3(newReleases);
-
             // Featured Hero Movie (random choice from first page)
             setFeaturedMovie(p1Results[Math.floor(Math.random() * p1Results.length)]);
           } else {
             setMoviesRow1([]);
             setMoviesRow2([]);
             setMoviesRow3([]);
+            setAllGenreMovies([]);
             setFeaturedMovie(null);
           }
         } else if (contentType === "tv") {
@@ -172,9 +181,74 @@ export default function Home() {
     loadContent();
   }, [contentType, selectedGenreId]);
 
+  // Infinite scroll: load more genre movies
+  const loadMoreGenreMovies = useCallback(async () => {
+    if (!selectedGenreId || isLoadingMore || !hasMoreGenrePages) return;
+console.log("Loading page:", genrePage);
+    setIsLoadingMore(true);
+    try {
+      const data = contentType === "tv"
+        ? await getTvByGenre(selectedGenreId, genrePage)
+        : await getMoviesByGenre(selectedGenreId, genrePage);
+
+      const newResults = data.results || [];
+      if (newResults.length === 0) {
+        setHasMoreGenrePages(false);
+      } else {
+        setAllGenreMovies((prev) => {
+          // Deduplicate by id
+          const existingIds = new Set(prev.map((m) => m.id));
+          const unique = newResults.filter((m: Movie) => !existingIds.has(m.id));
+          return [...prev, ...unique];
+        });
+        setGenrePage((prev) => prev + 1);
+
+        // Check if we've reached the last page
+        const totalPages = data.total_pages || 1;
+        if (genrePage >= totalPages) {
+          setHasMoreGenrePages(false);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load more genre movies:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [selectedGenreId, genrePage, isLoadingMore, hasMoreGenrePages, contentType]);
+
+  // IntersectionObserver for infinite scroll trigger
+  useEffect(() => {
+    if (!selectedGenreId || !hasMoreGenrePages) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log("Observer triggered");
+          loadMoreGenreMovies();
+        }
+      },
+      {
+  root: null,
+  rootMargin: "1000px",
+  threshold: 0
+}
+    );
+
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+
+return () => observer.disconnect();
+  }, [selectedGenreId, hasMoreGenrePages, loadMoreGenreMovies]);
+
   // Actions
   const handleSelectMovie = (id: number, mediaType: "movie" | "tv") => {
     navigate(`/${mediaType === "tv" ? "tv" : "movies"}/${id}`);
+  };
+
+  // Genre grid click handler — uses contentType directly instead of fragile title/name detection
+  const handleGenreItemClick = (movie: Movie) => {
+    const mediaType = contentType === "tv" ? "tv" : "movie";
+    handleSelectMovie(movie.id, mediaType as "movie" | "tv");
   };
 
   const handleSearch = (query: string) => {
@@ -200,7 +274,7 @@ export default function Home() {
 
   // Helper values for background details mapping
   const featuredTitle = featuredMovie ? (featuredMovie.title || (featuredMovie as any).name) : "";
-  const featuredOverview = featuredMovie ? featuredMovie.overview : "";
+  const featuredOverview = featuredMovie?.overview?.trim() || "No overview available.";
 
   if (isLoading) {
     return (
@@ -241,6 +315,7 @@ export default function Home() {
             </div>
           ))}
         </div>
+        
       </div>
     );
   }
@@ -337,10 +412,11 @@ export default function Home() {
       {/* Main Browse Catalog */}
       <div className="relative z-20 pb-20 -mt-18 md:mt-18 space-y-10 md:space-y-14">
         {selectedGenreId ? (
-          /* Genre Rows View */
+          /* Genre View */
           <>
-            {moviesRow1.length > 0 ? (
+            {allGenreMovies.length > 0 ? (
               <>
+                {/* Horizontal scroll rows */}
                 <MovieRow
                   title={`Popular ${currentGenreName} ${contentType === "tv" ? "TV Shows" : "Movies"}`}
                   movies={moviesRow1}
@@ -353,12 +429,61 @@ export default function Home() {
                   onPlay={handleSelectMovie}
                   onMoreInfo={handleSelectMovie}
                 />
-                <MovieRow
-                  title="New & Upcoming"
-                  movies={moviesRow3}
-                  onPlay={handleSelectMovie}
-                  onMoreInfo={handleSelectMovie}
-                />
+
+                {/* All Genre Movies — Infinite Scroll Grid */}
+                <div className="px-6 md:px-12 mt-10">
+                  <h2 className="text-xl md:text-2xl font-bold mb-6 tracking-wide">
+                    All {currentGenreName} {contentType === "tv" ? "TV Shows" : "Movies"}
+                  </h2>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5">
+                    {allGenreMovies.map((movie) => (
+                      <div
+                        key={movie.id}
+                        onClick={() => handleGenreItemClick(movie)}
+                        className="cursor-pointer group"
+                      >
+                        <div className="overflow-hidden rounded-xl bg-zinc-900">
+                          <img
+                            src={
+                              movie.poster_path
+                                ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
+                                : "/placeholder.jpg"
+                            }
+                            alt={movie.title || (movie as any).name}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full aspect-[2/3] object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        </div>
+
+                        <div className="mt-3">
+                          <h4 className="text-white font-semibold line-clamp-1 group-hover:text-red-500 transition">
+                            {movie.title || (movie as any).name}
+                          </h4>
+                          <div className="flex justify-between items-center mt-1">
+                            <span className="text-zinc-500 text-sm">
+                              {(movie.release_date || (movie as any).first_air_date || "")?.split("-")[0] || "N/A"}
+                            </span>
+                            <span className="text-yellow-400 text-sm">
+                              ★ {movie.vote_average?.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Infinite scroll trigger */}
+                  <div ref={loadMoreRef} className="py-10 flex justify-center">
+                    {isLoadingMore && (
+                      <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+                    )}
+                    {!hasMoreGenrePages && allGenreMovies.length > 0 && (
+                      <p className="text-zinc-600 text-sm">No more results</p>
+                    )}
+                  </div>
+                </div>
               </>
             ) : (
               <div className="text-center py-20 text-zinc-500 text-lg">

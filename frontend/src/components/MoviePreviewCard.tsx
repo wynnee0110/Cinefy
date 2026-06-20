@@ -125,7 +125,7 @@ export default function MoviePreviewCard({
             </div>
 
             <p className="text-zinc-300 text-sm line-clamp-3">
-              {movie.overview}
+              {movie.overview?.trim() || "No overview available."}
             </p>
           </div>
         </div>

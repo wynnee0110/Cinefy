@@ -51,6 +51,7 @@ export default function TvPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingEpisodes, setIsLoadingEpisodes] = useState(false);
   const [activeEpisode, setActiveEpisode] = useState<{ season: number; episode: number } | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (activeEpisode) {
@@ -67,6 +68,7 @@ export default function TvPage() {
   useEffect(() => {
     async function loadShow() {
       setIsLoading(true);
+      setError("");
       try {
         const data = await getTvShow(Number(id));
         setShow(data);
@@ -77,6 +79,8 @@ export default function TvPage() {
         }
       } catch (error) {
         console.error("Failed to load TV show:", error);
+        setShow(null);
+        setError(error instanceof Error ? error.message : "Failed to load TV show.");
       } finally {
         setIsLoading(false);
       }
@@ -104,6 +108,21 @@ export default function TvPage() {
   }, [id, selectedSeasonNum]);
 
   if (isLoading || !show) {
+    if (error) {
+      return (
+        <div className="bg-black min-h-screen flex flex-col items-center justify-center text-white px-6 text-center">
+          <h1 className="text-3xl font-bold mb-3">TV show unavailable</h1>
+          <p className="text-zinc-400 max-w-md">{error}</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 bg-white text-black px-6 py-2 rounded-full font-bold hover:bg-zinc-200 transition"
+          >
+            Go Back
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className="bg-black min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />

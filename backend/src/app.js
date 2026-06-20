@@ -15,6 +15,11 @@ const tvRoutes = require("./modules/tv/tv.routes");
 const app = express();
 
 app.set("trust proxy", true);
+
+const RATE_LIMIT_REFILL = Number(process.env.RATE_LIMIT_REFILL || 30);
+const RATE_LIMIT_INTERVAL = Number(process.env.RATE_LIMIT_INTERVAL || 10);
+const RATE_LIMIT_CAPACITY = Number(process.env.RATE_LIMIT_CAPACITY || 60);
+
 // Arcjet configuration
 const aj = arcjet({
   key: process.env.ARCJET_KEY,
@@ -33,9 +38,9 @@ const aj = arcjet({
     }),
     tokenBucket({
       mode: "LIVE",
-      refillRate: 5,
-      interval: 10,
-      capacity: 10,
+      refillRate: RATE_LIMIT_REFILL,
+      interval: RATE_LIMIT_INTERVAL,
+      capacity: RATE_LIMIT_CAPACITY,
     }),
   ],
 });
