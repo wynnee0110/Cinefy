@@ -27,8 +27,10 @@ export default function MoviePreviewCard({
     >
       {/* Poster */}
       <img
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+        src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
         alt={title}
+        loading="lazy"
+        decoding="async"
         className={`
           w-[320px] h-[400px] object-cover rounded-md
           transition-all duration-300 cursor-pointer
@@ -54,7 +56,7 @@ export default function MoviePreviewCard({
           {/* Backdrop */}
           <div className="relative h-[240px]">
             <img
-              src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`}
+              src={`https://image.tmdb.org/t/p/w780${movie.backdrop_path || movie.poster_path}`}
               alt={title}
               className="w-full h-full object-cover"
             />

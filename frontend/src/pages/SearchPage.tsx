@@ -96,7 +96,7 @@ export default function SearchPage() {
                   onClick={() => handleSelectMovie(featuredMovie.id)}
                 >
                   <img
-                    src={`https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path}`}
+                    src={`https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path}`}
                     alt={featuredMovie.title}
                     className="w-full h-[250px] sm:h-[350px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
                   />
@@ -161,10 +161,12 @@ export default function SearchPage() {
                       <img
                         src={
                           movie.poster_path
-                            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                            ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
                             : "/placeholder.jpg"
                         }
                         alt={movie.title}
+                        loading="lazy"
+                        decoding="async"
                         className="
                           w-full
                           aspect-[2/3]

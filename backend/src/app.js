@@ -1,5 +1,5 @@
 const express = require("express");
-
+const compression = require("compression");
 const cors = require("cors");
 const {
   default: arcjet,
@@ -49,6 +49,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.use(compression());
 app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(express.json());
 

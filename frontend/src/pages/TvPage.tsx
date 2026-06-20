@@ -138,7 +138,7 @@ export default function TvPage() {
       {/* Full-Screen Hero */}
       <section className="relative h-[80vh] w-full overflow-hidden">
         <img
-          src={`https://image.tmdb.org/t/p/original${show.backdrop_path || show.poster_path}`}
+          src={`https://image.tmdb.org/t/p/w1280${show.backdrop_path || show.poster_path}`}
           alt={show.name}
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -251,6 +251,8 @@ export default function TvPage() {
                     <img
                       src={`https://image.tmdb.org/t/p/w300${episode.still_path}`}
                       alt={episode.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                     />
                   ) : (

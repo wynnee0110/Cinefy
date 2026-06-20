@@ -204,8 +204,43 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+      <div className="bg-black min-h-screen text-white overflow-x-hidden">
+        {/* Header */}
+        <Header
+          isScrolled={isScrolled}
+          navigate={navigate}
+          onSearch={handleSearch}
+          onMovieClick={handleMovieClick}
+          onTvClick={handleTvClick}
+          onGenreSelect={handleGenreSelect}
+        />
+
+        {/* Hero Skeleton */}
+        <div className="relative h-[85vh] md:h-[90vh] bg-zinc-900 animate-pulse">
+          <div className="absolute bottom-24 md:bottom-14 left-6 md:left-12 max-w-2xl z-10 space-y-4">
+            <div className="h-12 w-96 bg-zinc-800 rounded-lg" />
+            <div className="h-4 w-80 bg-zinc-800 rounded" />
+            <div className="h-4 w-64 bg-zinc-800 rounded" />
+            <div className="flex gap-4 mt-6">
+              <div className="h-12 w-32 bg-zinc-800 rounded-full" />
+              <div className="h-12 w-36 bg-zinc-800 rounded-md" />
+            </div>
+          </div>
+        </div>
+
+        {/* Row Skeletons */}
+        <div className="space-y-10 md:space-y-14 px-6 md:px-12 py-10">
+          {[1, 2, 3].map((i) => (
+            <div key={i}>
+              <div className="h-7 w-48 bg-zinc-800 rounded mb-4 animate-pulse" />
+              <div className="flex gap-3 overflow-hidden">
+                {[...Array(6)].map((_, j) => (
+                  <div key={j} className="w-[320px] h-[400px] bg-zinc-900 rounded-md shrink-0 animate-pulse" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -227,7 +262,7 @@ export default function Home() {
         <section
           className="relative h-[85vh] md:h-[90vh] bg-cover bg-center"
           style={{
-            backgroundImage: `url(https://image.tmdb.org/t/p/original${featuredMovie.backdrop_path})`,
+            backgroundImage: `url(https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path})`,
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />

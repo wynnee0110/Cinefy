@@ -12,6 +12,7 @@
     "@arcjet/inspect": "^1.5.0",
     "@arcjet/node": "^1.5.0",
     "@upstash/redis": "^1.38.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.6",
     "dotenv": "^16.0.0",
     "express": "^5.2.1",

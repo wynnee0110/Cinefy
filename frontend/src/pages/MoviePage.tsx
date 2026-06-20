@@ -97,12 +97,12 @@ export default function MoviePage() {
         {/* Background: Trailer or Backdrop */}
         {trailerKey ? (
 <img
-  src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+  src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`}
   className="absolute inset-0 w-full h-full object-cover"
 />
         ) : (
           <img
-            src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`}
+            src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path || movie.poster_path}`}
             alt={movie.title}
             className="absolute inset-0 w-full h-full object-cover"
           />
