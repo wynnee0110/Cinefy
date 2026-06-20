@@ -35,16 +35,30 @@ const aj = arcjet({
   ],
 });
 
-app.use((req, res, next) => {
-  console.log("req.ip =", req.ip);
-  console.log("x-forwarded-for =", req.headers["x-forwarded-for"]);
-  next();
+// Health check — placed before Arcjet so Render's internal
+// health-check requests (from localhost / ::1) are never rate-limited.
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
 });
+
+app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
+app.use(express.json());
+
 // Arcjet middleware
 app.use(async (req, res, next) => {
   try {
+    // Provide a fallback IP when req.ip is empty or a loopback address
+    // (e.g. Render's internal health-check probes).
+    const ip = req.ip && !["::1", "127.0.0.1"].includes(req.ip)
+      ? req.ip
+      : "127.0.0.1";
+
     const decision = await aj.protect(req, {
       requested: 1,
+      ip,
     });
 
     if (decision.isDenied()) {
@@ -58,17 +72,6 @@ app.use(async (req, res, next) => {
     console.error("Arcjet error:", err);
     next();
   }
-});
-
-app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
-app.use(express.json());
-
-// Health check
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  });
 });
 
 // Routes
