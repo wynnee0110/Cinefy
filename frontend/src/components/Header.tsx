@@ -21,6 +21,7 @@ export default function Header({
 }: HeaderProps) {
   const [query, setQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isGenreOpen, setIsGenreOpen] = useState(false);
 
   const genres = [
     { id: 28, name: "Action" },
@@ -100,57 +101,64 @@ export default function Header({
               TV Shows
             </button>
 
-            {/* Genres Dropdown */}
-            <div className="relative group">
-              <button className="text-white hover:text-red-500 transition">
-                Genres ▼
-              </button>
+         <div className="relative">
+  <button
+    onClick={() => setIsGenreOpen(!isGenreOpen)}
+    className="text-white hover:text-red-500 transition"
+  >
+    Genres ▼
+  </button>
 
-              <div
-                className="
-                  absolute
-                  top-full
-                  left-0
-                  mt-3
-                  hidden
-                  group-hover:block
-                  bg-zinc-900
-                  rounded-lg
-                  shadow-2xl
-                  min-w-[220px]
-                  overflow-hidden
-                  border
-                  border-zinc-800
-                "
-              >
-                <div className="max-h-[350px] overflow-y-auto">
-                  {genres.map((genre) => (
-                    <button
-                      key={genre.id}
-                      onClick={() => {
-                        if (onGenreSelect) {
-                          onGenreSelect(genre.id);
-                        } else {
-                          navigate(`/?genre=${genre.id}`);
-                        }
-                      }}
-                      className="
-                        block
-                        w-full
-                        text-left
-                        px-4
-                        py-3
-                        text-white
-                        hover:bg-red-600
-                        transition-colors
-                      "
-                    >
-                      {genre.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+  {isGenreOpen && (
+    <div
+      className="
+        absolute
+        top-full
+        left-0
+        mt-3
+        bg-zinc-900
+        rounded-lg
+        shadow-2xl
+        w-[500px]
+        border
+        border-zinc-800
+        p-4
+        z-50
+      "
+    >
+      <div className="grid grid-cols-3 gap-2">
+        {genres.map((genre) => (
+          <button
+            key={genre.id}
+            onClick={() => {
+              if (onGenreSelect) {
+                onGenreSelect(genre.id);
+              } else {
+                navigate(`/?genre=${genre.id}`);
+              }
+
+              setIsGenreOpen(false);
+            }}
+            className="
+              text-left
+              px-3
+              py-2
+              rounded-md
+              text-white
+              hover:bg-red-600
+              transition
+            "
+          >
+            {genre.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+
+            
           </div>
         </div>
 
