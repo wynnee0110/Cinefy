@@ -50,15 +50,15 @@ app.use(express.json());
 // Arcjet middleware
 app.use(async (req, res, next) => {
   try {
-    // Provide a fallback IP when req.ip is empty or a loopback address
-    // (e.g. Render's internal health-check probes).
-    const ip = req.ip && !["::1", "127.0.0.1"].includes(req.ip)
-      ? req.ip
-      : "127.0.0.1";
+    // Skip Arcjet for requests with no real client IP (e.g. Render's
+    // internal health-check probes from localhost / ::1). Arcjet reads
+    // req.ip internally and cannot fingerprint loopback addresses.
+    if (!req.ip || ["::1", "127.0.0.1"].includes(req.ip)) {
+      return next();
+    }
 
     const decision = await aj.protect(req, {
       requested: 1,
-      ip,
     });
 
     if (decision.isDenied()) {
