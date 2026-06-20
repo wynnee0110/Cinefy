@@ -39,7 +39,8 @@ export default function Home() {
   // Read URL parameters
   const contentType = searchParams.get("type") || "all"; // "all" | "movies" | "tv"
   const genreIdStr = searchParams.get("genre");
-  const selectedGenreId = genreIdStr ? Number(genreIdStr) : null;
+  const selectedGenreId = genreIdStr ? Number(genreIdStr) : undefined;
+ 
 
   // State
   const [moviesRow1, setMoviesRow1] = useState<Movie[]>([]);
@@ -290,9 +291,11 @@ export default function Home() {
           isScrolled={isScrolled}
           navigate={navigate}
           onSearch={handleSearch}
+          
           onMovieClick={handleMovieClick}
           onTvClick={handleTvClick}
           onGenreSelect={handleGenreSelect}
+          selectedGenreId={selectedGenreId}
         />
 
         <div className="relative h-[85vh] md:h-[90vh] bg-zinc-900 animate-pulse">
@@ -325,14 +328,15 @@ export default function Home() {
 
   return (
     <div className="bg-black min-h-screen text-white overflow-x-hidden selection:bg-red-600 selection:text-white">
-      <Header
-        isScrolled={isScrolled}
-        navigate={navigate}
-        onSearch={handleSearch}
-        onMovieClick={handleMovieClick}
-        onTvClick={handleTvClick}
-        onGenreSelect={handleGenreSelect}
-      />
+<Header
+  isScrolled={isScrolled}
+  navigate={navigate}
+  onSearch={handleSearch}
+  onMovieClick={handleMovieClick}
+  onTvClick={handleTvClick}
+  onGenreSelect={handleGenreSelect}
+  selectedGenreId={selectedGenreId}
+/>
 
       {featuredMovie && (
         <section

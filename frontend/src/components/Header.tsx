@@ -9,6 +9,8 @@ interface HeaderProps {
   onMovieClick?: () => void;
   onTvClick?: () => void;
   onGenreSelect?: (genreId: number) => void;
+  selectedGenreId?: number;
+  
 }
 
 export default function Header({
@@ -18,6 +20,7 @@ export default function Header({
   onMovieClick,
   onTvClick,
   onGenreSelect,
+  selectedGenreId, // 👈 ADD THIS
 }: HeaderProps) {
   const [query, setQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -101,12 +104,15 @@ export default function Header({
               TV Shows
             </button>
 
-         <div className="relative">
+        <div className="relative">
   <button
     onClick={() => setIsGenreOpen(!isGenreOpen)}
     className="text-white hover:text-red-500 transition"
   >
-    Genres ▼
+    {selectedGenreId
+      ? genres.find((g) => g.id === selectedGenreId)?.name
+      : "Genres"}{" "}
+    {/* ARROW IICON TO BE ADDED */}
   </button>
 
   {isGenreOpen && (
@@ -139,15 +145,18 @@ export default function Header({
 
               setIsGenreOpen(false);
             }}
-            className="
+            className={`
               text-left
               px-3
               py-2
               rounded-md
-              text-white
-              hover:bg-red-600
               transition
-            "
+              ${
+                selectedGenreId === genre.id
+                  ? "bg-red-600 text-white"
+                  : "text-white hover:bg-red-600"
+              }
+            `}
           >
             {genre.name}
           </button>
@@ -156,7 +165,6 @@ export default function Header({
     </div>
   )}
 </div>
-
 
             
           </div>
