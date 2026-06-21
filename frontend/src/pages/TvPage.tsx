@@ -182,12 +182,13 @@ export default function TvPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 via-black/60 to-transparent px-10 py-5">
         <div className="flex items-center gap-8">
-          <h1
-            className="text-red-600 text-4xl font-black tracking-tight cursor-pointer"
-            onClick={() => navigate("/")}
-          >
-            CINEFY
-          </h1>
+<div onClick={() => navigate("/")} className="cursor-pointer">
+  <img
+    src="/logo.png"
+    alt="Cinefy Logo"
+    className="h-12 w-auto"
+  />
+</div>
 
           <button
             onClick={() => navigate(-1)}

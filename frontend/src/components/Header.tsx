@@ -66,26 +66,10 @@ export default function Header({
   <img
     src="/logo.png"
     alt="Cinefy Logo"
-    className="h-10 w-auto"
+    className="h-12 w-auto"
   />
 </div>
 
-          <h1
-            className="
-              text-red-600
-              text-2xl
-              md:text-4xlj
-              font-black
-              tracking-tighter
-              cursor-pointer
-              hover:text-red-500
-              transition
-              gap-2
-            "
-            onClick={() => navigate("/")}
-          >
-            CINEFY
-          </h1>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6 ml-8">
