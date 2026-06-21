@@ -98,8 +98,6 @@ export default function MoviePage() {
     return null;
   };
 
-  const trailerKey = movie ? getTrailerKey(movie) : null;
-
   if (isLoading || !movie) {
     if (error) {
       return (
