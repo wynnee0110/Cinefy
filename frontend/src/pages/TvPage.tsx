@@ -249,7 +249,19 @@ export default function TvPage() {
               <img
                 src={logoUrl}
                 alt={show.name}
-                className="max-h-[140px] max-w-[420px] object-contain"
+                className="
+  w-auto
+  max-w-[220px]
+  sm:max-w-[320px]
+  md:max-w-[450px]
+  lg:max-w-[600px]
+  max-h-[100px]
+  sm:max-h-[140px]
+  md:max-h-[180px]
+  lg:max-h-[220px]
+  object-contain
+  mb-5
+"
               />
             ) : (
               <h1 className="text-6xl md:text-7xl font-black leading-none">
