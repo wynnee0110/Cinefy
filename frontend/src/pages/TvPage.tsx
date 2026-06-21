@@ -212,7 +212,12 @@ export default function TvPage() {
         <img
           src={`https://image.tmdb.org/t/p/w1280${show.backdrop_path || show.poster_path}`}
           alt={show.name}
-          className="absolute inset-0 w-full h-full object-cover"
+                    className="
+  absolute inset-0
+  w-full h-full
+  object-cover
+  object-[60%_center]
+"
         />
 
         {/* Gradient Overlays */}
