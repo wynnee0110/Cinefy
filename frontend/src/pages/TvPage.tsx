@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSimilarTv, getTvImages, getTvSeason, getTvShow } from "../services/movie.service";
 import type { Genre, ProductionCompany, ProductionCountry, SimilarTvShow, SpokenLanguage, TmdbImages, TmdbLogo } from "../types/movie";
+import { useRef } from "react";
 
 interface Episode {
   id: number;
@@ -55,6 +56,17 @@ export default function TvPage() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [similarShows, setSimilarShows] = useState<SimilarTvShow[]>([]);
 
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.8;
+    el.scrollBy({
+      left: direction === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     if (activeEpisode) {
@@ -67,34 +79,29 @@ export default function TvPage() {
     };
   }, [activeEpisode]);
 
-
-
-
   useEffect(() => {
-  async function loadLogo() {
-    if (!id) return;
-    setLogoUrl(null);
+    async function loadLogo() {
+      if (!id) return;
+      setLogoUrl(null);
 
-    try {
-      const images: TmdbImages = await getTvImages(Number(id));
+      try {
+        const images: TmdbImages = await getTvImages(Number(id));
 
-      const logo =
-        images.logos?.find((l: TmdbLogo) => l.iso_639_1 === "en") ||
-        images.logos?.find((l: TmdbLogo) => l.iso_639_1 === null) ||
-        images.logos?.[0];
+        const logo =
+          images.logos?.find((l: TmdbLogo) => l.iso_639_1 === "en") ||
+          images.logos?.find((l: TmdbLogo) => l.iso_639_1 === null) ||
+          images.logos?.[0];
 
-      if (logo?.file_path) {
-        setLogoUrl(`https://image.tmdb.org/t/p/w500${logo.file_path}`);
+        if (logo?.file_path) {
+          setLogoUrl(`https://image.tmdb.org/t/p/w500${logo.file_path}`);
+        }
+      } catch (err) {
+        console.error("Failed to load TV logo:", err);
       }
-    } catch (err) {
-      console.error("Failed to load TV logo:", err);
     }
-  }
 
-  loadLogo();
-}, [id]);
-
-
+    loadLogo();
+  }, [id]);
 
   // Load main TV show details
   useEffect(() => {
@@ -185,7 +192,13 @@ export default function TvPage() {
             onClick={() => navigate(-1)}
             className="text-zinc-400 hover:text-white transition text-sm flex items-center gap-1.5"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back
@@ -225,19 +238,19 @@ export default function TvPage() {
             </span>
           </div>
 
-<div className="mb-4">
-  {logoUrl ? (
-    <img
-      src={logoUrl}
-      alt={show.name}
-      className="max-h-[140px] max-w-[420px] object-contain"
-    />
-  ) : (
-    <h1 className="text-6xl md:text-7xl font-black leading-none">
-      {show.name}
-    </h1>
-  )}
-</div>
+          <div className="mb-4">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={show.name}
+                className="max-h-[140px] max-w-[420px] object-contain"
+              />
+            ) : (
+              <h1 className="text-6xl md:text-7xl font-black leading-none">
+                {show.name}
+              </h1>
+            )}
+          </div>
 
           {show.tagline && (
             <p className="italic text-zinc-400 text-base mb-5 border-l-3 border-red-600 pl-4">
@@ -255,7 +268,7 @@ export default function TvPage() {
                 // Play first episode of first season
                 setActiveEpisode({ season: selectedSeasonNum, episode: 1 });
               }}
-              className="bg-white text-black px-8 py-3.5 rounded-full font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
+              className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 fill-current" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
@@ -267,7 +280,7 @@ export default function TvPage() {
               onClick={() => {
                 document.getElementById("episodes-section")?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-zinc-700/80 backdrop-blur-sm px-8 py-3.5 rounded-md font-bold hover:bg-zinc-600 transition text-lg"
+              className="bg-zinc-700/80 backdrop-blur-sm px-8 py-3 rounded-md font-bold hover:bg-zinc-600 transition text-lg"
             >
               Episodes
             </button>
@@ -276,9 +289,9 @@ export default function TvPage() {
       </section>
 
       {/* Episodes Picker Section */}
-      <section id="episodes-section" className="max-w-7xl mx-auto px-10 md:px-16 py-18 border-t border-zinc-900">
+      <section id="episodes-section" className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-20 border-t border-zinc-900">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-          <h2 className="text-3xl font-bold">Episodes</h2>
+          <h2 className="text-3xl md:text-4xl font-black">Episodes</h2>
 
           {/* Season Selector */}
           <div className="relative">
@@ -342,7 +355,13 @@ export default function TvPage() {
                       {episode.episode_number}. {episode.name}
                     </h3>
                     <p className="text-zinc-400 text-xs mt-1">
-                      {episode.air_date ? new Date(episode.air_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : ""}
+                      {episode.air_date
+                        ? new Date(episode.air_date).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : ""}
                     </p>
                     <p className="text-zinc-400 text-sm mt-2 line-clamp-2 leading-snug">
                       {episode.overview || "No description available for this episode."}
@@ -356,7 +375,7 @@ export default function TvPage() {
       </section>
 
       {/* Show Details Section */}
-      <section className="max-w-7xl mx-auto px-10 md:px-16 py-12 border-t border-zinc-900">
+      <section className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-12 border-t border-zinc-900">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Left */}
           <div className="md:col-span-2 space-y-8">
@@ -414,50 +433,111 @@ export default function TvPage() {
 
       {/* Similar Shows Section */}
       {similarShows.length > 0 && (
-        <section className="max-w-7xl mx-auto px-10 md:px-16 py-12 border-t border-zinc-900">
-          <h2 className="text-3xl font-bold mb-8">Similar Shows</h2>
+        <section className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 pb-0">
+          <h2 className="text-3xl md:text-4xl font-black mb-8 text-white tracking-tight">
+            Similar Shows
+          </h2>
 
-          <div className="flex gap-5 overflow-x-auto pb-4">
-            {similarShows.map((similarShow) => (
-              <div
-                key={similarShow.id}
-                onClick={() => navigate(`/tv/${similarShow.id}`)}
-                className="min-w-[160px] md:min-w-[180px] cursor-pointer group"
+          <div className="relative group">
+            {/* LEFT ARROW */}
+            <button
+              onClick={() => scroll("left")}
+              className="absolute -left-6 md:left-0 top-1/2 -translate-y-1/2 z-20
+                       opacity-0 group-hover:opacity-100 transition-opacity
+                       bg-black/70 hover:bg-red-600 text-white
+                       w-12 h-12 rounded-full flex items-center justify-center
+                       backdrop-blur-md transition-colors"
+              aria-label="Scroll left"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <div className="relative rounded-xl overflow-hidden bg-zinc-900">
-                  {similarShow.poster_path ? (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w300${similarShow.poster_path}`}
-                      alt={similarShow.name}
-                      className="w-full h-[260px] object-cover group-hover:scale-105 transition duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-[260px] flex items-center justify-center bg-zinc-900 text-zinc-500 px-4 text-center text-sm">
-                      No Poster
-                    </div>
-                  )}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
 
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                    <span className="font-bold">View</span>
+            {/* RIGHT ARROW */}
+            <button
+              onClick={() => scroll("right")}
+              className="absolute -right-6 md:right-0 top-1/2 -translate-y-1/2 z-20
+                       opacity-0 group-hover:opacity-100 transition-opacity
+                       bg-black/70 hover:bg-red-600 text-white
+                       w-12 h-12 rounded-full flex items-center justify-center
+                       backdrop-blur-md transition-colors"
+              aria-label="Scroll right"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Scroll Container - NO SCROLLBAR */}
+            <div
+              ref={scrollRef}
+              className="flex gap-6 overflow-x-auto pb-6 scroll-smooth snap-x snap-mandatory
+                       [&::-webkit-scrollbar]:hidden
+                       [-ms-overflow-style:none]
+                       [scrollbar-width:none]"
+            >
+              {similarShows.map((similarShow) => (
+                <div
+                  key={similarShow.id}
+                  onClick={() => navigate(`/tv/${similarShow.id}`)}
+                  className="flex-shrink-0 snap-start cursor-pointer group/card"
+                  style={{ minWidth: "200px" }}
+                >
+                  {/* Poster Card */}
+                  <div className="aspect-[2/3] w-[200px] rounded-lg overflow-hidden bg-zinc-900 shadow-lg transition-transform duration-300 group-hover/card:scale-105">
+                    {similarShow.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w342${similarShow.poster_path}`}
+                        alt={similarShow.name}
+                        className="w-full h-full object-cover transition-brightness duration-300 group-hover/card:brightness-110"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-zinc-500 text-xs text-center p-2 bg-zinc-800">
+                        No Poster Available
+                      </div>
+                    )}
                   </div>
-                </div>
 
-                <p className="mt-2 text-sm text-zinc-300 truncate">
-                  {similarShow.name}
-                </p>
-              </div>
-            ))}
+                  {/* Title */}
+                  <p className="mt-3 text-sm text-zinc-300 line-clamp-2 group-hover/card:text-white transition w-[200px]">
+                    {similarShow.name}
+                  </p>
+
+                  {/* First Air Year */}
+                  {similarShow.first_air_date && (
+                    <p className="text-xs text-zinc-500 mt-1">
+                      {new Date(similarShow.first_air_date).getFullYear()}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
 
       {/* Video Player Modal */}
       {activeEpisode && (
-        <div className="fixed inset-0 z-50 bg-black">
+        <div className="fixed inset-0 z-50 bg-black/95">
           {/* Close button */}
           <button
             onClick={() => setActiveEpisode(null)}
-            className="absolute top-5 right-5 text-white text-3xl z-50 bg-black/60 w-12 h-12 rounded-full hover:bg-black transition flex items-center justify-center"
+            className="absolute top-6 right-6 text-white text-4xl z-50 hover:text-red-600 transition"
+            aria-label="Close player"
           >
             ✕
           </button>
