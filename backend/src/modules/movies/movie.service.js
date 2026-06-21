@@ -149,7 +149,7 @@ exports.search = async (query, page = 1) => {
   const cacheKey = `movies:search:v2:${encodeURIComponent(query.trim())}:page:${page}`;
   return getOrSetCache(cacheKey, TTL.SEARCH, async () => {
     const response = await fetch(
-      `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=${page}`,
+      `${BASE_URL}/search/multi?query=${encodeURIComponent(query)}&page=${page}`,
       { headers }
     );
     if (!response.ok) throw new Error(`TMDB error: ${response.status}`);

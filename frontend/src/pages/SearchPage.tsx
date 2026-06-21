@@ -13,6 +13,17 @@ export default function SearchPage() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Helper function to get title for both movies and TV shows
+  const getTitle = (item: Movie): string => {
+    return item.title || item.name || "Unknown";
+  };
+
+  // Helper function to get release year for both movies and TV shows
+  const getReleaseYear = (item: Movie): string => {
+    const date = item.release_date || item.first_air_date;
+    return date?.split("-")[0] || "N/A";
+  };
+
   useEffect(() => {
     async function performSearch() {
       if (!query.trim()) {
@@ -63,7 +74,7 @@ export default function SearchPage() {
                 <span className="text-red-500">"{query}"</span>
               </>
             ) : (
-              "Search Movies"
+              "Search Movies & TV Shows"
             )}
           </h1>
 
@@ -97,7 +108,7 @@ export default function SearchPage() {
                 >
                   <img
                     src={`https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path}`}
-                    alt={featuredMovie.title}
+                    alt={getTitle(featuredMovie)}
                     className="w-full h-[250px] sm:h-[350px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
                   />
 
@@ -106,7 +117,7 @@ export default function SearchPage() {
                   <div className="absolute inset-0 flex items-center">
                     <div className="max-w-2xl px-6 md:px-12">
                       <h2 className="text-3xl md:text-6xl font-black mb-3">
-                        {featuredMovie.title}
+                        {getTitle(featuredMovie)}
                       </h2>
 
                       <div className="flex gap-4 mb-4 text-sm md:text-base">
@@ -115,7 +126,7 @@ export default function SearchPage() {
                         </span>
 
                         <span className="text-zinc-300">
-                          {featuredMovie.release_date?.split("-")[0]}
+                          {getReleaseYear(featuredMovie)}
                         </span>
                       </div>
 
@@ -164,7 +175,7 @@ export default function SearchPage() {
                             ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
                             : "/placeholder.jpg"
                         }
-                        alt={movie.title}
+                        alt={getTitle(movie)}
                         loading="lazy"
                         decoding="async"
                         className="
@@ -188,12 +199,12 @@ export default function SearchPage() {
                           transition
                         "
                       >
-                        {movie.title}
+                        {getTitle(movie)}
                       </h4>
 
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-zinc-500 text-sm">
-                          {movie.release_date?.split("-")[0] || "N/A"}
+                          {getReleaseYear(movie)}
                         </span>
 
                         <span className="text-yellow-400 text-sm">
@@ -223,11 +234,11 @@ export default function SearchPage() {
             <div className="text-7xl mb-6">🔍</div>
 
             <h2 className="text-2xl font-semibold mb-2">
-              Search Movies
+              Search Movies & TV Shows
             </h2>
 
             <p className="text-zinc-400">
-              Type a movie title in the search bar above.
+              Type a movie or TV show title in the search bar above.
             </p>
           </section>
         )}

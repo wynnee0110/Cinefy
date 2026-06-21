@@ -1,11 +1,14 @@
 export interface Movie {
   id: number;
-  title: string;
-  poster_path: string;
-  backdrop_path?: string;
+  title?: string;           // ✅ For movies
+  name?: string;            // ✅ For TV shows
+  poster_path: string | null;
+  backdrop_path?: string | null;
   overview: string;
-  release_date: string;
+  release_date?: string;    // ✅ For movies
+  first_air_date?: string;  // ✅ For TV shows
   vote_average: number;
+  media_type?: "movie" | "tv";
 }
 
 export interface Genre {
@@ -84,3 +87,4 @@ export interface TmdbLogo {
 export interface TmdbImages {
   logos?: TmdbLogo[];
 }
+

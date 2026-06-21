@@ -87,7 +87,7 @@ export default function Header({
               TV Shows
             </button>
 
-        <div className="relative">
+<div className="relative">
 <button
   onClick={() => setIsGenreOpen(!isGenreOpen)}
   className="flex items-center gap-2 text-white hover:text-red-500 transition"
@@ -170,6 +170,9 @@ export default function Header({
   )}
 </div>
 
+
+
+
             
           </div>
         </div>
@@ -201,8 +204,10 @@ export default function Header({
           </button>
         </div>
 
+
         {/* Right: Search */}
         <div className="flex-1 md:flex-none flex justify-end">
+          
           <form onSubmit={handleSubmit}>
             <input
               type="text"
