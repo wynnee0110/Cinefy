@@ -82,7 +82,7 @@ export default function MoviePage() {
     if (id) loadMovie();
   }, [id]);
 
-  // Extract YouTube trailer key
+
 
 
   if (isLoading || !movie) {
@@ -109,7 +109,9 @@ export default function MoviePage() {
   }
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div
+    
+    className="bg-black text-white min-h-screen">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 via-black/60 to-transparent px-10 py-5">
         <div className="flex items-center gap-8">
@@ -144,7 +146,12 @@ export default function MoviePage() {
         <img
           src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path || movie.poster_path}`}
           alt={movie.title}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="
+  absolute inset-0
+  w-full h-full
+  object-cover
+  object-[60%_center]
+"
         />
 
         {/* Gradient Overlays */}
@@ -177,7 +184,19 @@ export default function MoviePage() {
             <img
               src={logoUrl}
               alt={movie.title}
-              className="max-w-[600px] max-h-[220px] object-contain mb-5"
+              className="
+  w-auto
+  max-w-[220px]
+  sm:max-w-[320px]
+  md:max-w-[450px]
+  lg:max-w-[600px]
+  max-h-[100px]
+  sm:max-h-[140px]
+  md:max-h-[180px]
+  lg:max-h-[220px]
+  object-contain
+  mb-5
+"
             />
           ) : (
             <h1 className="text-7xl font-black mb-5 drop-shadow-xl leading-none">
