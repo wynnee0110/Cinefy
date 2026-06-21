@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMovie, getMovieImages, getSimilarMovies } from "../services/movie.service";
-import type { MovieDetail, SimilarMovie, TmdbImages, TmdbLogo, VideoResult } from "../types/movie";
+import type { MovieDetail, SimilarMovie, TmdbImages, TmdbLogo } from "../types/movie";
 import { useRef } from "react";
 
 export default function MoviePage() {
@@ -83,20 +83,7 @@ export default function MoviePage() {
   }, [id]);
 
   // Extract YouTube trailer key
-  const getTrailerKey = (movieDetail: MovieDetail | null) => {
-    if (!movieDetail?.videos?.results) return null;
-    const videos = movieDetail.videos.results;
 
-    const trailer = videos.find(
-      (vid: VideoResult) => vid.site === "YouTube" && vid.type === "Trailer"
-    );
-    if (trailer) return trailer.key;
-
-    const clip = videos.find((vid: VideoResult) => vid.site === "YouTube");
-    if (clip) return clip.key;
-
-    return null;
-  };
 
   if (isLoading || !movie) {
     if (error) {
