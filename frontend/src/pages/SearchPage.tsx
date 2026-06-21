@@ -50,9 +50,13 @@ export default function SearchPage() {
     setSearchParams({ q: newQuery });
   };
 
-  const handleSelectMovie = (movieId: number) => {
-    navigate(`/movies/${movieId}`);
-  };
+  const handleSelectMovie = (item: Movie) => {
+  if (item.media_type === "tv") {
+    navigate(`/tv/${item.id}`);
+  } else {
+    navigate(`/movies/${item.id}`);
+  }
+};
 
   const featuredMovie = movies[0];
 
@@ -104,7 +108,7 @@ export default function SearchPage() {
               <section className="px-4 sm:px-6 md:px-12 mb-12">
                 <div
                   className="relative rounded-2xl overflow-hidden cursor-pointer group"
-                  onClick={() => handleSelectMovie(featuredMovie.id)}
+                  onClick={() => handleSelectMovie(featuredMovie)}
                 >
                   <img
                     src={`https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path}`}
@@ -165,7 +169,7 @@ export default function SearchPage() {
                 {movies.slice(1).map((movie) => (
                   <button
                     key={movie.id}
-                    onClick={() => handleSelectMovie(movie.id)}
+                    onClick={() => handleSelectMovie(movie)}
                     className="group text-left"
                   >
                     <div className="overflow-hidden rounded-xl bg-zinc-900">
