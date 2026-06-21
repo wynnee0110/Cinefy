@@ -55,6 +55,7 @@ export default function TvPage() {
   const [error, setError] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [similarShows, setSimilarShows] = useState<SimilarTvShow[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -294,23 +295,64 @@ export default function TvPage() {
           <h2 className="text-3xl md:text-4xl font-black">Episodes</h2>
 
           {/* Season Selector */}
-          <div className="relative">
-            <select
-              value={selectedSeasonNum}
-              onChange={(e) => setSelectedSeasonNum(Number(e.target.value))}
-              className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:border-red-600 cursor-pointer appearance-none text-lg font-semibold"
+{/* Custom Season Dropdown */}
+          <div className="relative w-full md:w-auto md:min-w-[280px]">
+            {/* The Box You Click */}
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full flex items-center justify-between bg-zinc-800/80 backdrop-blur-md border-2 border-zinc-700 hover:border-red-500 text-white rounded-2xl px-5 py-3.5 outline-none text-lg font-bold tracking-wide transition-all duration-300 shadow-lg"
             >
-              {show.seasons
-                .filter((s) => s.season_number > 0)
-                .map((season) => (
-                  <option key={season.id} value={season.season_number}>
-                    {season.name} ({season.episode_count} Episodes)
-                  </option>
-                ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-              ▼
-            </div>
+              <span>
+                {show.seasons.find(s => s.season_number === selectedSeasonNum)?.name || "Select Season"}
+              </span>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className={`h-6 w-6 transition-transform duration-300 ${isDropdownOpen ? "rotate-180 text-red-500" : "text-zinc-400"}`} 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* The Dropdown Menu List */}
+            {isDropdownOpen && (
+              <div className="absolute z-50 top-full left-0 right-0 mt-3 bg-zinc-900 border-2 border-zinc-800 rounded-2xl shadow-2xl p-2 flex flex-col gap-1 max-h-80 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {show.seasons
+                  .filter((s) => s.season_number > 0)
+                  .map((season) => {
+                    const isSelected = selectedSeasonNum === season.season_number;
+                    return (
+                      <button
+                        key={season.id}
+                        onClick={() => {
+                          setSelectedSeasonNum(season.season_number);
+                          setIsDropdownOpen(false); // Close menu on click
+                        }}
+                        className={`text-left w-full px-4 py-3 rounded-xl font-bold transition-all duration-200 flex justify-between items-center ${
+                          isSelected
+                            ? "bg-red-600 text-white"
+                            : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                        }`}
+                      >
+                        <span>{season.name}</span>
+                        <span className={`text-xs font-medium ${isSelected ? "text-red-200" : "text-zinc-600"}`}>
+                          {season.episode_count} Episodes
+                        </span>
+                      </button>
+                    );
+                  })}
+              </div>
+            )}
+            
+            {/* Invisible background overlay to close dropdown when clicking outside */}
+            {isDropdownOpen && (
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setIsDropdownOpen(false)}
+              />
+            )}
           </div>
         </div>
 
@@ -341,6 +383,8 @@ export default function TvPage() {
                       No Image
                     </div>
                   )}
+
+                  
                   {/* Overlay play button on hover */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white fill-current" viewBox="0 0 24 24">
