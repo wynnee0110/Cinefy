@@ -3,6 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getMovie } from "../services/movie.service";
 import type { MovieDetail, VideoResult } from "../types/movie";
 
+
+interface SimilarMovie {
+  id: number;
+  title: string;
+  poster_path: string | null;
+  backdrop_path?: string | null;
+  vote_average?: number;
+  release_date?: string;
+}
+
 export default function MoviePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,6 +21,7 @@ export default function MoviePage() {
   const [showPlayer, setShowPlayer] = useState(false);
   const [error, setError] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [similarMovies, setSimilarMovies] = useState<SimilarMovie[]>([]);
 
 
   useEffect(() => {
@@ -36,6 +47,15 @@ export default function MoviePage() {
       try {
         const data = await getMovie(Number(id));
         setMovie(data);
+        try {
+  const res = await fetch(`http://localhost:5000/movies/${id}/similar`);
+  const data = await res.json();
+
+  setSimilarMovies(data.results || []);
+} catch (err) {
+  console.error("Failed to load similar movies", err);
+}
+        
           try {
   const res = await fetch(
     `http://localhost:5000/movies/${id}/images`
@@ -223,27 +243,33 @@ export default function MoviePage() {
 
       </section>
 
-      {/* Movie Details Section */}
-      <section id="movie-details" className="max-w-7xl mx-auto px-10 md:px-16 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* Left: Overview & Description */}
-          <div className="md:col-span-2 space-y-8">
+{/* Movie Details Section */}
+      <section id="movie-details" className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-20 bg-black">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+          
+          {/* Main Content Area (Left) */}
+          <div className="flex-1 space-y-12">
+            {/* Storyline */}
             <div>
-              <h2 className="text-3xl font-bold mb-6">About {movie.title}</h2>
-              <p className="text-zinc-300 text-lg leading-relaxed">
+              <h2 className="text-3xl md:text-4xl font-black mb-6 tracking-tight text-white">
+                Storyline
+              </h2>
+              <p className="text-zinc-300 text-lg md:text-xl leading-relaxed font-light">
                 {movie.overview || "No overview available."}
               </p>
             </div>
 
             {/* Genres */}
             {movie.genres && movie.genres.length > 0 && (
-              <div>
-                <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-3">Genres</h3>
-                <div className="flex flex-wrap gap-2">
+              <div className="pt-8 border-t border-zinc-800/60">
+                <h3 className="text-sm font-bold tracking-widest uppercase text-zinc-500 mb-5">
+                  Genres
+                </h3>
+                <div className="flex flex-wrap gap-3">
                   {movie.genres.map((g) => (
                     <span
                       key={g.id}
-                      className="bg-zinc-900 border border-zinc-800 text-zinc-300 px-4 py-1.5 rounded-full text-sm hover:border-zinc-600 transition"
+                      className="bg-zinc-800/40 text-zinc-200 px-5 py-2 rounded-full text-sm font-medium hover:bg-zinc-700 transition cursor-default"
                     >
                       {g.name}
                     </span>
@@ -254,22 +280,26 @@ export default function MoviePage() {
 
             {/* Production Companies */}
             {movie.production_companies && movie.production_companies.length > 0 && (
-              <div>
-                <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-3">Production</h3>
-                <div className="flex flex-wrap gap-4">
+              <div className="pt-8 border-t border-zinc-800/60">
+                <h3 className="text-sm font-bold tracking-widest uppercase text-zinc-500 mb-6">
+                  Production
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {movie.production_companies.map((company) => (
                     <div
                       key={company.id}
-                      className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-2"
+                      className="flex items-center justify-center p-5 bg-zinc-900/30 rounded-xl border border-zinc-800/50 hover:border-zinc-700 transition"
                     >
                       {company.logo_path ? (
                         <img
                           src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
                           alt={company.name}
-                          className="h-6 object-contain invert opacity-70"
+                          className="max-h-8 object-contain filter invert opacity-60"
                         />
                       ) : (
-                        <span className="text-zinc-400 text-sm">{company.name}</span>
+                        <span className="text-zinc-400 font-medium text-sm text-center">
+                          {company.name}
+                        </span>
                       )}
                     </div>
                   ))}
@@ -278,91 +308,144 @@ export default function MoviePage() {
             )}
           </div>
 
-          {/* Right: Metadata sidebar */}
-          <div className="space-y-6">
-            {/* Rating */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-              <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Rating</h3>
-              <div className="flex items-center gap-3">
-                <span className="text-4xl font-black text-white">
-                  {movie.vote_average?.toFixed(1)}
-                </span>
-                <div className="text-zinc-400 text-sm">
-                  <div>out of 10</div>
-                  <div>{movie.vote_count?.toLocaleString()} votes</div>
+          {/* Sidebar Details (Right) */}
+          <div className="lg:w-1/3">
+            <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-8 sticky top-28">
+              <h3 className="text-xl font-bold text-white mb-8">Movie Info</h3>
+              
+              <dl className="space-y-6">
+                {/* Rating */}
+                <div className="flex flex-col">
+                  <dt className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">
+                    Rating
+                  </dt>
+                  <dd className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-white">
+                      {movie.vote_average?.toFixed(1)}
+                    </span>
+                    <span className="text-sm text-zinc-500 font-medium">
+                      / 10 ({movie.vote_count?.toLocaleString()} votes)
+                    </span>
+                  </dd>
                 </div>
-              </div>
-            </div>
 
-            {/* Runtime */}
-            {movie.runtime > 0 && (
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-                <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Runtime</h3>
-                <span className="text-xl font-bold text-white">
-                  {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
-                </span>
-                <span className="text-zinc-500 text-sm ml-2">({movie.runtime} min)</span>
-              </div>
-            )}
+                <hr className="border-zinc-800/60" />
 
-            {/* Release Date */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-              <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Release Date</h3>
-              <span className="text-lg font-semibold text-white">
-                {movie.release_date
-                  ? new Date(movie.release_date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                  : "N/A"}
-              </span>
-            </div>
-
-            {/* Budget & Revenue */}
-            {(movie.budget > 0 || movie.revenue > 0) && (
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 space-y-3">
-                {movie.budget > 0 && (
-                  <div>
-                    <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-1">Budget</h3>
-                    <span className="text-lg font-semibold text-white">
-                      ${movie.budget.toLocaleString()}
-                    </span>
-                  </div>
+                {/* Duration */}
+                {movie.runtime > 0 && (
+                  <>
+                    <div className="flex flex-col">
+                      <dt className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">
+                        Duration
+                      </dt>
+                      <dd className="text-lg text-zinc-200 font-medium">
+                        {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
+                      </dd>
+                    </div>
+                    <hr className="border-zinc-800/60" />
+                  </>
                 )}
-                {movie.revenue > 0 && (
-                  <div>
-                    <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-1">Revenue</h3>
-                    <span className="text-lg font-semibold text-emerald-400">
-                      ${movie.revenue.toLocaleString()}
-                    </span>
-                  </div>
+
+                {/* Release Date */}
+                <div className="flex flex-col">
+                  <dt className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">
+                    Release Date
+                  </dt>
+                  <dd className="text-lg text-zinc-200 font-medium">
+                    {movie.release_date
+                      ? new Date(movie.release_date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "N/A"}
+                  </dd>
+                </div>
+
+                {/* Budget & Revenue */}
+                {((movie.budget > 0) || (movie.revenue > 0)) && (
+                  <>
+                    <hr className="border-zinc-800/60" />
+                    <div className="grid grid-cols-2 gap-4">
+                      {movie.budget > 0 && (
+                        <div className="flex flex-col">
+                          <dt className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">
+                            Budget
+                          </dt>
+                          <dd className="text-lg text-zinc-200 font-medium">
+                            ${(movie.budget / 1000000).toFixed(1)}M
+                          </dd>
+                        </div>
+                      )}
+                      {movie.revenue > 0 && (
+                        <div className="flex flex-col">
+                          <dt className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">
+                            Box Office
+                          </dt>
+                          <dd className="text-lg text-emerald-400 font-medium">
+                            ${(movie.revenue / 1000000).toFixed(1)}M
+                          </dd>
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
-              </div>
-            )}
 
-            {/* Countries */}
-            {movie.production_countries && movie.production_countries.length > 0 && (
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-                <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Country</h3>
-                <span className="text-white">
-                  {movie.production_countries.map((c) => c.name).join(", ")}
-                </span>
-              </div>
-            )}
-
-            {/* Languages */}
-            {movie.spoken_languages && movie.spoken_languages.length > 0 && (
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-                <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-2">Languages</h3>
-                <span className="text-white">
-                  {movie.spoken_languages.map((l) => l.english_name).join(", ")}
-                </span>
-              </div>
-            )}
+                {/* Languages */}
+                {movie.spoken_languages && movie.spoken_languages.length > 0 && (
+                  <>
+                    <hr className="border-zinc-800/60" />
+                    <div className="flex flex-col">
+                      <dt className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">
+                        Languages
+                      </dt>
+                      <dd className="text-sm text-zinc-300 leading-relaxed">
+                        {movie.spoken_languages.map(l => l.english_name).join(", ")}
+                      </dd>
+                    </div>
+                  </>
+                )}
+              </dl>
+            </div>
           </div>
+          
         </div>
-      </section>
+  </section> {/* End Movie Details Section */}
+
+{/* Similar Movies Section */}
+{similarMovies.length > 0 && (
+  <section className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 pb-20">
+    <h2 className="text-3xl md:text-4xl font-black mb-8 text-white">
+      Similar Movies
+    </h2>
+
+    <div className="flex gap-5 overflow-x-auto pb-4">
+      {similarMovies.map((m) => (
+        <div
+          key={m.id}
+          onClick={() => navigate(`/movie/${m.id}`)}
+          className="min-w-[160px] md:min-w-[180px] cursor-pointer group"
+        >
+          <div className="relative rounded-xl overflow-hidden bg-zinc-900">
+            <img
+              src={`https://image.tmdb.org/t/p/w300${m.poster_path}`}
+              alt={m.title}
+              className="w-full h-[260px] object-cover group-hover:scale-105 transition duration-300"
+            />
+
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              <span className="font-bold">View</span>
+            </div>
+          </div>
+
+          <p className="mt-2 text-sm text-zinc-300 truncate">
+            {m.title}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
 
       {showPlayer && (
   <div className="fixed inset-0 z-50 bg-black">
