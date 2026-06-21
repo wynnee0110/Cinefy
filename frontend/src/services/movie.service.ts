@@ -25,6 +25,14 @@ export async function getMovie(id: string | number) {
   return fetchJson(`/movies/${id}`);
 }
 
+export async function getMovieImages(id: string | number) {
+  return fetchJson(`/movies/${id}/images`);
+}
+
+export async function getSimilarMovies(id: string | number) {
+  return fetchJson(`/movies/${id}/similar`);
+}
+
 export async function getMoviesByGenre(genreId: string | number, page = 1) {
   return fetchJson(`/movies/genre/${genreId}?page=${page}`);
 }
@@ -45,6 +53,14 @@ export async function getTrendingTv(timeWindow = "week") {
 
 export async function getTvShow(id: string | number) {
   return fetchJson(`/tv/${id}`);
+}
+
+export async function getTvImages(id: string | number) {
+  return fetchJson(`/tv/${id}/images`);
+}
+
+export async function getSimilarTv(id: string | number) {
+  return fetchJson(`/tv/${id}/similar`);
 }
 
 export async function getTvByGenre(genreId: string | number, page = 1) {

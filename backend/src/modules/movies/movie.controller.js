@@ -93,3 +93,12 @@ exports.getImages = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getSimilar = async (req, res) => {
+  try {
+    const data = await movieService.getSimilar(req.params.id);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}

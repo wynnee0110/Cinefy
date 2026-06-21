@@ -12,6 +12,7 @@ router.get("/airing-today",        tvController.getAiringToday);
 router.get("/on-the-air",          tvController.getOnTheAir);
 router.get("/genres",              tvController.getGenres);
 router.get("/search",              tvController.search);
+router.get("/:id/similar",         tvController.getSimilar);
 
 
 router.get("/:id/images",          tvController.getImages);

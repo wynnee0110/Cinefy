@@ -165,3 +165,11 @@ exports.getImages = async (id) => {
     return response.json();
   });
 };
+
+exports.getSimilar = async (id) => {
+  return getOrSetCache(`movies:similar:v2:${id}`, TTL.POPULAR, async () => {
+    const response = await fetch(`${BASE_URL}/movie/${id}/similar`, { headers });
+    if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
+    return withResultsOverviewFallback(await response.json());
+  });
+}

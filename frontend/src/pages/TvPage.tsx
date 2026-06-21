@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTvShow, getTvSeason } from "../services/movie.service";
-import type { Genre, ProductionCompany, ProductionCountry, SpokenLanguage } from "../types/movie";
+import { getSimilarTv, getTvImages, getTvSeason, getTvShow } from "../services/movie.service";
+import type { Genre, ProductionCompany, ProductionCountry, SimilarTvShow, SpokenLanguage, TmdbImages, TmdbLogo } from "../types/movie";
 
 interface Episode {
   id: number;
@@ -53,6 +53,7 @@ export default function TvPage() {
   const [activeEpisode, setActiveEpisode] = useState<{ season: number; episode: number } | null>(null);
   const [error, setError] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [similarShows, setSimilarShows] = useState<SimilarTvShow[]>([]);
 
 
   useEffect(() => {
@@ -72,14 +73,14 @@ export default function TvPage() {
   useEffect(() => {
   async function loadLogo() {
     if (!id) return;
+    setLogoUrl(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/tv/${id}/images`);
-      const images = await res.json();
+      const images: TmdbImages = await getTvImages(Number(id));
 
       const logo =
-        images.logos?.find((l: any) => l.iso_639_1 === "en") ||
-        images.logos?.find((l: any) => l.iso_639_1 === null) ||
+        images.logos?.find((l: TmdbLogo) => l.iso_639_1 === "en") ||
+        images.logos?.find((l: TmdbLogo) => l.iso_639_1 === null) ||
         images.logos?.[0];
 
       if (logo?.file_path) {
@@ -100,6 +101,7 @@ export default function TvPage() {
     async function loadShow() {
       setIsLoading(true);
       setError("");
+      setSimilarShows([]);
       try {
         const data = await getTvShow(Number(id));
         setShow(data);
@@ -107,6 +109,12 @@ export default function TvPage() {
           // Find the first valid season (usually 1, ignore season 0 specials for default)
           const firstSeason = data.seasons.find((s: Season) => s.season_number > 0) || data.seasons[0];
           setSelectedSeasonNum(firstSeason.season_number);
+        }
+        try {
+          const similar = await getSimilarTv(Number(id));
+          setSimilarShows(similar.results || []);
+        } catch (error) {
+          console.error("Failed to load similar TV shows:", error);
         }
       } catch (error) {
         console.error("Failed to load TV show:", error);
@@ -403,6 +411,45 @@ export default function TvPage() {
           </div>
         </div>
       </section>
+
+      {/* Similar Shows Section */}
+      {similarShows.length > 0 && (
+        <section className="max-w-7xl mx-auto px-10 md:px-16 py-12 border-t border-zinc-900">
+          <h2 className="text-3xl font-bold mb-8">Similar Shows</h2>
+
+          <div className="flex gap-5 overflow-x-auto pb-4">
+            {similarShows.map((similarShow) => (
+              <div
+                key={similarShow.id}
+                onClick={() => navigate(`/tv/${similarShow.id}`)}
+                className="min-w-[160px] md:min-w-[180px] cursor-pointer group"
+              >
+                <div className="relative rounded-xl overflow-hidden bg-zinc-900">
+                  {similarShow.poster_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w300${similarShow.poster_path}`}
+                      alt={similarShow.name}
+                      className="w-full h-[260px] object-cover group-hover:scale-105 transition duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-[260px] flex items-center justify-center bg-zinc-900 text-zinc-500 px-4 text-center text-sm">
+                      No Poster
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                    <span className="font-bold">View</span>
+                  </div>
+                </div>
+
+                <p className="mt-2 text-sm text-zinc-300 truncate">
+                  {similarShow.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Video Player Modal */}
       {activeEpisode && (

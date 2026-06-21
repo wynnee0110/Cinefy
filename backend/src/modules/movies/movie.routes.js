@@ -12,6 +12,7 @@ router.get("/upcoming",           movieController.getUpcoming);
 router.get("/now-playing",        movieController.getNowPlaying);
 router.get("/genres",             movieController.getGenres);
 router.get("/search",             movieController.search);
+router.get("/:id/similar", movieController.getSimilar);
 
 // Genre-based discovery
 router.get("/genre/:genreId",     movieController.getByGenre);

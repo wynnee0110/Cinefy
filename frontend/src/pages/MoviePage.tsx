@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMovie } from "../services/movie.service";
-import type { MovieDetail, VideoResult } from "../types/movie";
-
-
-interface SimilarMovie {
-  id: number;
-  title: string;
-  poster_path: string | null;
-  backdrop_path?: string | null;
-  vote_average?: number;
-  release_date?: string;
-}
+import { getMovie, getMovieImages, getSimilarMovies } from "../services/movie.service";
+import type { MovieDetail, SimilarMovie, TmdbImages, TmdbLogo, VideoResult } from "../types/movie";
 
 export default function MoviePage() {
   const { id } = useParams();
@@ -43,28 +33,26 @@ export default function MoviePage() {
     async function loadMovie() {
       setIsLoading(true);
       setError("");
+      setLogoUrl(null);
+      setSimilarMovies([]);
       
       try {
         const data = await getMovie(Number(id));
         setMovie(data);
+        console.log(similarMovies)
         try {
-  const res = await fetch(`http://localhost:5000/movies/${id}/similar`);
-  const data = await res.json();
+  const similar = await getSimilarMovies(Number(id));
 
-  setSimilarMovies(data.results || []);
+  setSimilarMovies(similar.results || []);
 } catch (err) {
   console.error("Failed to load similar movies", err);
 }
         
           try {
-  const res = await fetch(
-    `http://localhost:5000/movies/${id}/images`
-  );
-
-  const images = await res.json();
+  const images: TmdbImages = await getMovieImages(Number(id));
 
   const logo =
-    images.logos?.find((l: any) => l.iso_639_1 === "en") ||
+    images.logos?.find((l: TmdbLogo) => l.iso_639_1 === "en") ||
     images.logos?.[0];
 
   if (logo) {
@@ -310,7 +298,7 @@ export default function MoviePage() {
 
           {/* Sidebar Details (Right) */}
           <div className="lg:w-1/3">
-            <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-8 sticky top-28">
+            <div className="">
               <h3 className="text-xl font-bold text-white mb-8">Movie Info</h3>
               
               <dl className="space-y-6">
@@ -320,9 +308,18 @@ export default function MoviePage() {
                     Rating
                   </dt>
                   <dd className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-white">
-                      {movie.vote_average?.toFixed(1)}
-                    </span>
+                    {}
+<span
+  className={`text-3xl font-black ${
+    movie.vote_average >= 8
+      ? "text-green-500"
+      : movie.vote_average >= 6
+      ? "text-yellow-500"
+      : "text-red-500"
+  }`}
+>
+  {movie.vote_average?.toFixed(1)}
+</span>
                     <span className="text-sm text-zinc-500 font-medium">
                       / 10 ({movie.vote_count?.toLocaleString()} votes)
                     </span>
@@ -414,39 +411,46 @@ export default function MoviePage() {
 
 {/* Similar Movies Section */}
 {similarMovies.length > 0 && (
-  <section className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 pb-20">
-    <h2 className="text-3xl md:text-4xl font-black mb-8 text-white">
+  <div className="relative px-6 md:px-10 lg:px-16 pb-20">
+
+    <h2 className="text-2xl font-bold mb-6 text-white">
       Similar Movies
     </h2>
 
-    <div className="flex gap-5 overflow-x-auto pb-4">
+    {/* scroll container */}
+    <div className="flex gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4">
+
       {similarMovies.map((m) => (
         <div
           key={m.id}
-          onClick={() => navigate(`/movie/${m.id}`)}
-          className="min-w-[160px] md:min-w-[180px] cursor-pointer group"
+          onClick={() => navigate(`/movies/${m.id}`)}
+          className="min-w-[200px] flex-shrink-0 snap-start cursor-pointer group"
         >
-          <div className="relative rounded-xl overflow-hidden bg-zinc-900">
-            <img
-              src={`https://image.tmdb.org/t/p/w300${m.poster_path}`}
-              alt={m.title}
-              className="w-full h-[260px] object-cover group-hover:scale-105 transition duration-300"
-            />
+          <div className="w-[200px] h-[260px] rounded-xl overflow-hidden bg-zinc-900">
 
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-              <span className="font-bold">View</span>
-            </div>
+            {m.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w342${m.poster_path}`}
+                alt={m.title}
+                className="w-full h-full object-cover transition duration-500 group-hover:scale-110"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-zinc-500 text-sm">
+                No Poster Available
+              </div>
+            )}
+
           </div>
 
-          <p className="mt-2 text-sm text-zinc-300 truncate">
+          <p className="mt-2 text-sm text-zinc-300 truncate w-[200px]">
             {m.title}
           </p>
         </div>
       ))}
-    </div>
-  </section>
-)}
 
+    </div>
+  </div>
+)}
       {showPlayer && (
   <div className="fixed inset-0 z-50 bg-black">
     
