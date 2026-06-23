@@ -33,7 +33,7 @@ export default function MoviePreviewCard({
         decoding="async"
         className={`
           w-[320px] h-[400px] object-cover rounded-md
-          transition-all duration-300 cursor-pointer
+          transition-all duration-300 cursor-pointer rounded-xl
           ${isHovered ? "opacity-0" : "opacity-100"}
         `}
       />
@@ -80,6 +80,7 @@ export default function MoviePreviewCard({
                     rounded-full
                     font-bold
                     flex items-center gap-1.5
+
                     hover:bg-zinc-200
                     text-sm
                     transition
