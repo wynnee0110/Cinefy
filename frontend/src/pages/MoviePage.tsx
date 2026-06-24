@@ -218,7 +218,20 @@ export default function MoviePage() {
           {/* Action Buttons */}
           <div className="flex gap-4">
             <button
-              onClick={() => setShowPlayer(true)}
+              onClick={() => {
+  localStorage.setItem(
+    "cinefy_continue",
+    JSON.stringify({
+      id: movie.id,
+      title: movie.title,
+      poster: movie.poster_path,
+      backdrop: movie.backdrop_path,
+      updatedAt: Date.now(),
+    })
+  );
+
+  setShowPlayer(true);
+}}
               className="bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 fill-current" viewBox="0 0 24 24">

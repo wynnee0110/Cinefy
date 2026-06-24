@@ -10,6 +10,7 @@ import {
 } from "../services/movie.service";
 import MovieRow from "../components/MovieRow";
 import Header from "../components/Header";
+import ContinueWatching from "../components/ContinueWatching";
 
 import type { Movie } from "../types/movie";
 
@@ -526,12 +527,19 @@ export default function Home() {
               onPlay={handleSelectMovie}
               onMoreInfo={handleSelectMovie}
             />
+
+            <ContinueWatching
+  onPlay={handleSelectMovie}
+  onMoreInfo={handleSelectMovie}
+/>
             <MovieRow
               title="Popular Movies"
               movies={moviesRow2}
               onPlay={handleSelectMovie}
               onMoreInfo={handleSelectMovie}
             />
+
+
             <MovieRow
               title="Upcoming Blockbusters"
               movies={moviesRow3}
