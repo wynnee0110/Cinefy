@@ -555,6 +555,10 @@ export default function Home() {
               onPlay={handleSelectMovie}
               onMoreInfo={handleSelectMovie}
             />
+            <ContinueWatching
+              onPlay={handleSelectMovie}
+              onMoreInfo={handleSelectMovie}
+            />
             <MovieRow
               title="Popular TV Shows"
               movies={moviesRow2}

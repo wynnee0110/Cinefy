@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSimilarTv, getTvImages, getTvSeason, getTvShow } from "../services/movie.service";
+import { addToContinueWatching } from "../utils/continueWatching";
 import type { Genre, ProductionCompany, ProductionCountry, SimilarTvShow, SpokenLanguage, TmdbImages, TmdbLogo } from "../types/movie";
 import { useRef } from "react";
 
@@ -284,7 +285,16 @@ export default function TvPage() {
           <div className="flex gap-4">
             <button
               onClick={() => {
-                // Play first episode of first season
+                addToContinueWatching({
+                  id: show.id,
+                  name: show.name,
+                  poster_path: show.poster_path,
+                  backdrop_path: show.backdrop_path,
+                  overview: show.overview,
+                  vote_average: show.vote_average,
+                  first_air_date: show.first_air_date,
+                  media_type: "tv",
+                });
                 setActiveEpisode({ season: selectedSeasonNum, episode: 1 });
               }}
               className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
@@ -384,7 +394,19 @@ export default function TvPage() {
             {episodes.map((episode) => (
               <div
                 key={episode.id}
-                onClick={() => setActiveEpisode({ season: episode.season_number, episode: episode.episode_number })}
+                onClick={() => {
+                  addToContinueWatching({
+                    id: show.id,
+                    name: show.name,
+                    poster_path: show.poster_path,
+                    backdrop_path: show.backdrop_path,
+                    overview: show.overview,
+                    vote_average: show.vote_average,
+                    first_air_date: show.first_air_date,
+                    media_type: "tv",
+                  });
+                  setActiveEpisode({ season: episode.season_number, episode: episode.episode_number });
+                }}
                 className="group flex gap-4 bg-zinc-900/40 hover:bg-zinc-900/90 border border-zinc-900 hover:border-zinc-800 rounded-xl p-4 cursor-pointer transition duration-300"
               >
                 <div className="relative w-40 h-24 shrink-0 rounded-lg overflow-hidden bg-zinc-800">

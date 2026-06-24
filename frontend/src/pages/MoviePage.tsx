@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMovie, getMovieImages, getSimilarMovies } from "../services/movie.service";
+import { addToContinueWatching } from "../utils/continueWatching";
 import type { MovieDetail, SimilarMovie, TmdbImages, TmdbLogo } from "../types/movie";
 import { useRef } from "react";
 
@@ -219,19 +220,18 @@ export default function MoviePage() {
           <div className="flex gap-4">
             <button
               onClick={() => {
-  localStorage.setItem(
-    "cinefy_continue",
-    JSON.stringify({
-      id: movie.id,
-      title: movie.title,
-      poster: movie.poster_path,
-      backdrop: movie.backdrop_path,
-      updatedAt: Date.now(),
-    })
-  );
-
-  setShowPlayer(true);
-}}
+                addToContinueWatching({
+                  id: movie.id,
+                  title: movie.title,
+                  poster_path: movie.poster_path,
+                  backdrop_path: movie.backdrop_path,
+                  overview: movie.overview,
+                  vote_average: movie.vote_average,
+                  release_date: movie.release_date,
+                  media_type: "movie",
+                });
+                setShowPlayer(true);
+              }}
               className="bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-zinc-200 transition flex items-center gap-2 text-lg shadow-lg"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 fill-current" viewBox="0 0 24 24">

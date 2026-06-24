@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import MovieRow from "./MovieRow";
 import type { Movie } from "../types/movie";
+import { getContinueWatching } from "../utils/continueWatching";
 
 interface Props {
   onPlay: (id: number, mediaType: "movie" | "tv") => void;
@@ -14,16 +15,7 @@ export default function ContinueWatching({
   const [movies, setMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("cinefy_continue_movies");
-
-    if (!saved) return;
-
-    try {
-      const parsed = JSON.parse(saved);
-      setMovies(parsed);
-    } catch {
-      console.error("Failed to load continue watching");
-    }
+    setMovies(getContinueWatching());
   }, []);
 
   if (movies.length === 0) return null;
