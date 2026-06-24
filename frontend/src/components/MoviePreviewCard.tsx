@@ -5,12 +5,14 @@ interface MoviePreviewCardProps {
   movie: Movie;
   onPlay?: (id: number, mediaType: "movie" | "tv") => void;
   onMoreInfo?: (id: number, mediaType: "movie" | "tv") => void;
+  compact?: boolean;
 }
 
 export default function MoviePreviewCard({
   movie,
   onPlay,
   onMoreInfo,
+  compact = false,
 }: MoviePreviewCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -32,7 +34,7 @@ export default function MoviePreviewCard({
         loading="lazy"
         decoding="async"
         className={`
-          w-[320px] h-[400px] object-cover rounded-md
+          ${compact ? "w-[220px] h-[280px]" : "w-[320px] h-[400px]"} object-cover rounded-md
           transition-all duration-300 cursor-pointer rounded-xl
           ${isHovered ? "opacity-0" : "opacity-100"}
         `}
@@ -41,20 +43,19 @@ export default function MoviePreviewCard({
       {/* Floating Preview */}
       {isHovered && (
         <div  
-          className="
+          className={`
             absolute top-0 left-0
-            w-[320px]
-            h-[400px]
+            ${compact ? "w-[220px] h-[280px]" : "w-[320px] h-[400px]"}
             bg-zinc-900
             rounded-xl
             overflow-hidden
             shadow-2xl
             z-50
             animate-in fade-in zoom-in-95
-          "
+          `}
         >
           {/* Backdrop */}
-          <div className="relative h-[240px]">
+          <div className={`relative ${compact ? "h-[160px]" : "h-[240px]"}`}>
             <img
               src={`https://image.tmdb.org/t/p/w780${movie.backdrop_path || movie.poster_path}`}
               alt={title}
@@ -65,7 +66,7 @@ export default function MoviePreviewCard({
 
             {/* Movie Title */}
             <div className="absolute bottom-6 left-6 right-6">
-              <h2 className="text-3xl font-black text-white drop-shadow-lg truncate">
+              <h2 className={`${compact ? "text-xl" : "text-3xl"} font-black text-white drop-shadow-lg truncate`}>
                 {title}
               </h2>
 
@@ -114,7 +115,7 @@ export default function MoviePreviewCard({
           </div>
 
           {/* Info */}
-          <div className="p-4">
+          <div className={compact ? "p-3" : "p-4"}>
             <div className="flex gap-3 items-center mb-3">
               <span className="text-green-500 font-semibold">
                 {Math.round(movie.vote_average * 10)}% Rating

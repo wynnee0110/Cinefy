@@ -26,6 +26,7 @@ export default function ContinueWatching({
       movies={movies}
       onPlay={onPlay}
       onMoreInfo={onMoreInfo}
+      compact
     />
   );
 }

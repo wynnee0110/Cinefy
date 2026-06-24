@@ -7,9 +7,10 @@ interface MovieRowProps {
   movies: Movie[];
   onPlay: (id: number, mediaType: "movie" | "tv") => void;
   onMoreInfo: (id: number, mediaType: "movie" | "tv") => void;
+  compact?: boolean;
 }
 
-export default function MovieRow({ title, movies, onPlay, onMoreInfo }: MovieRowProps) {
+export default function MovieRow({ title, movies, onPlay, onMoreInfo, compact = false }: MovieRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -48,7 +49,7 @@ export default function MovieRow({ title, movies, onPlay, onMoreInfo }: MovieRow
 
   return (
     <section className="px-6 md:px-12">
-      <h2 className="text-xl md:text-2xl font-bold mb-4 tracking-wide">
+      <h2 className={`${compact ? "text-lg md:text-xl" : "text-xl md:text-2xl"} font-bold mb-4 tracking-wide`}>
         {title}
       </h2>
 
@@ -102,6 +103,7 @@ export default function MovieRow({ title, movies, onPlay, onMoreInfo }: MovieRow
     movie={movie}
     onPlay={onPlay}
     onMoreInfo={onMoreInfo}
+    compact={compact}
   />
 </div>
           ))}

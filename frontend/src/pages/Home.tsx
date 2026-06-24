@@ -413,7 +413,7 @@ export default function Home() {
         </section>
       )}
 
-      <div className="relative z-20 pb-20 -mt-18 md:mt-18 space-y-10 md:space-y-14">
+      <div className="relative z-20 pb-20 -mt-18 md:mt-18 space-y-4 md:space-y-6">
         {selectedGenreId ? (
           <>
             {allGenreMovies.length > 0 ? (
