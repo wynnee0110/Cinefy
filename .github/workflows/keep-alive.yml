@@ -1,0 +1,28 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Trigger every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping Backend Health Endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend
+        run: |
+          URL="${{ secrets.BACKEND_URL }}"
+          if [ -z "$URL" ]; then
+            URL="https://cinefy-backend-l25h.onrender.com/health"
+          fi
+          echo "Pinging $URL..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$URL")
+          echo "HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Backend is alive and responsive."
+          else
+            echo "Backend health check failed with status code: $HTTP_STATUS"
+            exit 1
+          fi
