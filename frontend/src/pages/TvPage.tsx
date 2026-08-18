@@ -183,13 +183,13 @@ export default function TvPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 via-black/60 to-transparent px-10 py-5">
         <div className="flex items-center gap-8">
-<div onClick={() => navigate("/")} className="cursor-pointer">
-  <img
-    src="/logo.png"
-    alt="Cinefy Logo"
-    className="h-12 w-auto"
-  />
-</div>
+          <div onClick={() => navigate("/")} className="cursor-pointer">
+            <img
+              src="/logo.png"
+              alt="Cinefy Logo"
+              className="h-12 w-auto"
+            />
+          </div>
 
           <button
             onClick={() => navigate(-1)}
@@ -214,7 +214,7 @@ export default function TvPage() {
         <img
           src={`https://image.tmdb.org/t/p/w1280${show.backdrop_path || show.poster_path}`}
           alt={show.name}
-                    className="
+          className="
   absolute inset-0
   w-full h-full
   object-cover
@@ -323,7 +323,7 @@ export default function TvPage() {
           <h2 className="text-3xl md:text-4xl font-black">Episodes</h2>
 
           {/* Season Selector */}
-{/* Custom Season Dropdown */}
+          {/* Custom Season Dropdown */}
           <div className="relative w-full md:w-auto md:min-w-[280px]">
             {/* The Box You Click */}
             <button
@@ -333,11 +333,11 @@ export default function TvPage() {
               <span>
                 {show.seasons.find(s => s.season_number === selectedSeasonNum)?.name || "Select Season"}
               </span>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className={`h-6 w-6 transition-transform duration-300 ${isDropdownOpen ? "rotate-180 text-red-500" : "text-zinc-400"}`} 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-6 w-6 transition-transform duration-300 ${isDropdownOpen ? "rotate-180 text-red-500" : "text-zinc-400"}`}
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
@@ -358,11 +358,10 @@ export default function TvPage() {
                           setSelectedSeasonNum(season.season_number);
                           setIsDropdownOpen(false); // Close menu on click
                         }}
-                        className={`text-left w-full px-4 py-3 rounded-xl font-bold transition-all duration-200 flex justify-between items-center ${
-                          isSelected
+                        className={`text-left w-full px-4 py-3 rounded-xl font-bold transition-all duration-200 flex justify-between items-center ${isSelected
                             ? "bg-red-600 text-white"
                             : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-                        }`}
+                          }`}
                       >
                         <span>{season.name}</span>
                         <span className={`text-xs font-medium ${isSelected ? "text-red-200" : "text-zinc-600"}`}>
@@ -373,11 +372,11 @@ export default function TvPage() {
                   })}
               </div>
             )}
-            
+
             {/* Invisible background overlay to close dropdown when clicking outside */}
             {isDropdownOpen && (
-              <div 
-                className="fixed inset-0 z-40" 
+              <div
+                className="fixed inset-0 z-40"
                 onClick={() => setIsDropdownOpen(false)}
               />
             )}
@@ -424,7 +423,7 @@ export default function TvPage() {
                     </div>
                   )}
 
-                  
+
                   {/* Overlay play button on hover */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white fill-current" viewBox="0 0 24 24">
@@ -441,10 +440,10 @@ export default function TvPage() {
                     <p className="text-zinc-400 text-xs mt-1">
                       {episode.air_date
                         ? new Date(episode.air_date).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
                         : ""}
                     </p>
                     <p className="text-zinc-400 text-sm mt-2 line-clamp-2 leading-snug">

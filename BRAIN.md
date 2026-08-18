@@ -8,12 +8,56 @@
 > node brain-cli.js save decision "what was decided"
 > ```
 
-**Last updated:** 2026-08-18T14:16:15.668Z
-**Total memories:** 21
+**Last updated:** 2026-08-18T14:49:15.628Z
+**Total memories:** 33
 
 ---
 
 ## Tasks
+
+### 2026-08-18_14-48-59-436Z.md
+# Tasks Entry
+
+**Date:** 2026-08-18T14:48:59.436Z
+**Related Task:** N/A
+
+---
+
+Added inline pitch black #000000 background to html, body, root in index.html and App.tsx to eliminate initial load white flashing
+
+
+### 2026-08-18_14-47-19-270Z.md
+# Tasks Entry
+
+**Date:** 2026-08-18T14:47:19.270Z
+**Related Task:** N/A
+
+---
+
+Updated sequence timing so IntroAnimation runs exclusively first before mounting Home screen and routes
+
+
+### 2026-08-18_14-45-25-395Z.md
+# Tasks Entry
+
+**Date:** 2026-08-18T14:45:25.395Z
+**Related Task:** N/A
+
+---
+
+Updated intro animation to a minimalist pure-black logo fade reveal
+
+
+### 2026-08-18_14-43-36-453Z.md
+# Tasks Entry
+
+**Date:** 2026-08-18T14:43:36.453Z
+**Related Task:** N/A
+
+---
+
+Added cinematic website intro animation and fixed UI inconsistencies across MoviePage and TvPage carousels, headers, and skeleton loaders
+
 
 ### 2026-08-18_14-16-06-340Z.md
 # Tasks Entry
@@ -96,6 +140,50 @@ Built infinite scroll genre grid, movie detail pages with playback, search page,
 
 ## Lessons
 
+### 2026-08-18_14-49-15-609Z.md
+# Lessons Entry
+
+**Date:** 2026-08-18T14:49:15.609Z
+**Related Task:** N/A
+
+---
+
+Browser default body color is white (#ffffff) prior to CSS parsing; setting inline style background-color: #000000 on HTML and BODY in index.html prevents pre-load white flashes in dark-mode apps
+
+
+### 2026-08-18_14-47-28-711Z.md
+# Lessons Entry
+
+**Date:** 2026-08-18T14:47:28.711Z
+**Related Task:** N/A
+
+---
+
+Preventing background route mounting during intro animation avoids UI flashing and background data fetch layout shifts before the splash screen completes
+
+
+### 2026-08-18_14-45-37-403Z.md
+# Lessons Entry
+
+**Date:** 2026-08-18T14:45:37.403Z
+**Related Task:** N/A
+
+---
+
+Minimalist intro splash screens feel cleaner and more premium when focused purely on a single logo scale-fade effect (~1.1s total) without progress bars or extra subtext
+
+
+### 2026-08-18_14-43-47-842Z.md
+# Lessons Entry
+
+**Date:** 2026-08-18T14:43:47.842Z
+**Related Task:** N/A
+
+---
+
+Carousel card width mismatches (e.g. 300px image container vs 200px title text) break flex wrap layout and cause horizontal distortion — standardized to w-40 sm:w-48 md:w-56 responsive units
+
+
 ### 2026-08-18_14-16-15-653Z.md
 # Lessons Entry
 
@@ -176,6 +264,50 @@ Arcjet IP detection fails in dev mode — use x-forwarded-for header fallback fo
 ---
 
 ## Decisions
+
+### 2026-08-18_14-49-11-936Z.md
+# Decisions Entry
+
+**Date:** 2026-08-18T14:49:11.936Z
+**Related Task:** N/A
+
+---
+
+Set inline style background-color: #000000 on html, body, #root, App wrapper, and IntroAnimation to guarantee zero initial frame flashing before React mounts
+
+
+### 2026-08-18_14-47-25-115Z.md
+# Decisions Entry
+
+**Date:** 2026-08-18T14:47:25.115Z
+**Related Task:** N/A
+
+---
+
+Controlled route mounting in App.tsx using isIntroComplete state so Home screen doesn't mount or fetch data until after the intro animation finishes playing
+
+
+### 2026-08-18_14-45-32-722Z.md
+# Decisions Entry
+
+**Date:** 2026-08-18T14:45:32.722Z
+**Related Task:** N/A
+
+---
+
+Designed minimalist intro screen with pure black background, subtle red ambient glow, and centered logo scale-fade transition lasting ~1.1 seconds
+
+
+### 2026-08-18_14-43-44-605Z.md
+# Decisions Entry
+
+**Date:** 2026-08-18T14:43:44.605Z
+**Related Task:** N/A
+
+---
+
+Used sessionStorage for IntroAnimation to trigger cinematic splash on site entry while preserving instant navigation on internal page transitions
+
 
 ### 2026-08-18_14-16-09-571Z.md
 # Decisions Entry

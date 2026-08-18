@@ -111,18 +111,18 @@ export default function MoviePage() {
 
   return (
     <div
-    
-    className="bg-black text-white min-h-screen">
+
+      className="bg-black text-white min-h-screen">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 via-black/60 to-transparent px-10 py-5">
         <div className="flex items-center gap-8">
-<div onClick={() => navigate("/")} className="cursor-pointer">
-  <img
-    src="/logo.png"
-    alt="Cinefy Logo"
-    className="h-12 w-auto"
-  />
-</div>
+          <div onClick={() => navigate("/")} className="cursor-pointer">
+            <img
+              src="/logo.png"
+              alt="Cinefy Logo"
+              className="h-12 w-auto"
+            />
+          </div>
 
           <button
             onClick={() => navigate(-1)}
@@ -329,13 +329,12 @@ export default function MoviePage() {
                   </dt>
                   <dd className="flex items-baseline gap-2">
                     <span
-                      className={`text-3xl font-black ${
-                        movie.vote_average >= 8
+                      className={`text-3xl font-black ${movie.vote_average >= 8
                           ? "text-green-500"
                           : movie.vote_average >= 6
                             ? "text-yellow-500"
                             : "text-red-500"
-                      }`}
+                        }`}
                     >
                       {movie.vote_average?.toFixed(1)}
                     </span>
@@ -370,10 +369,10 @@ export default function MoviePage() {
                   <dd className="text-lg text-zinc-200 font-medium">
                     {movie.release_date
                       ? new Date(movie.release_date).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
                       : "N/A"}
                   </dd>
                 </div>

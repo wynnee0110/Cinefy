@@ -1,10 +1,21 @@
 @import "tailwindcss";
 
-@utility scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
+html,
+body,
+#root {
+  background-color: #000000 !important;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -16,18 +27,39 @@
   scrollbar-width: none;
 }
 
-/* Mobile only */
-@media (max-width: 768px) {
-  * {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+/* Custom Keyframe Animations */
+@keyframes logoPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.85;
   }
-
-  *::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Edge */
+  100% {
+    transform: scale(1.02);
+    opacity: 1;
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Mobile & tablet scrollbar hide */
 @media (max-width: 1024px) {
   * {
     scrollbar-width: none;
