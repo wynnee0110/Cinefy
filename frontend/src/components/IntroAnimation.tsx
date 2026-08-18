@@ -1,31 +1,47 @@
 import { useEffect, useState } from "react";
 
-interface IntroAnimationProps {
-  onComplete?: () => void;
-}
-
-export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
+export default function IntroAnimation() {
+  const [isVisible, setIsVisible] = useState(() => {
+    try {
+      return !sessionStorage.getItem("cinefy_intro_seen");
+    } catch {
+      return true;
+    }
+  });
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Immediate mount check to trigger CSS fade-in
-    const mountTimer = setTimeout(() => setIsMounted(true), 20);
+    if (!isVisible) return;
 
-    // Trigger smooth fade-out
+    // Trigger smooth fade-in after mounting
+    const mountTimer = setTimeout(() => {
+      setIsMounted(true);
+    }, 20);
+
+    // Trigger fade-out
     const fadeTimer = setTimeout(() => {
       setIsFadingOut(true);
-      setTimeout(() => {
+    }, 1000);
+
+    // Hide completely and set sessionStorage flag
+    const hideTimer = setTimeout(() => {
+      try {
         sessionStorage.setItem("cinefy_intro_seen", "true");
-        onComplete?.();
-      }, 400); // 400ms fade-out transition
-    }, 1000); // 1.0s logo display time
+      } catch (err) {
+        console.error("Session storage error:", err);
+      }
+      setIsVisible(false);
+    }, 1400);
 
     return () => {
       clearTimeout(mountTimer);
       clearTimeout(fadeTimer);
+      clearTimeout(hideTimer);
     };
-  }, [onComplete]);
+  }, []); // Empty dependency array ensures timers run ONCE without premature cleanup resets
+
+  if (!isVisible) return null;
 
   return (
     <div
@@ -34,7 +50,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
       }`}
       style={{ backgroundColor: "#000000" }}
     >
-      {/* Pure Minimalist Logo Reveal */}
+      {/* Minimalist Logo Reveal */}
       <div className="relative z-10 flex items-center justify-center px-4">
         <img
           src="/logo.png"

@@ -8,12 +8,23 @@
 > node brain-cli.js save decision "what was decided"
 > ```
 
-**Last updated:** 2026-08-18T14:49:15.628Z
-**Total memories:** 33
+**Last updated:** 2026-08-18T15:14:46.529Z
+**Total memories:** 36
 
 ---
 
 ## Tasks
+
+### 2026-08-18_15-14-38-368Z.md
+# Tasks Entry
+
+**Date:** 2026-08-18T15:14:38.368Z
+**Related Task:** N/A
+
+---
+
+Fixed intro animation timer loop and production loading screen freeze
+
 
 ### 2026-08-18_14-48-59-436Z.md
 # Tasks Entry
@@ -140,6 +151,17 @@ Built infinite scroll genre grid, movie detail pages with playback, search page,
 
 ## Lessons
 
+### 2026-08-18_15-14-46-515Z.md
+# Lessons Entry
+
+**Date:** 2026-08-18T15:14:46.515Z
+**Related Task:** N/A
+
+---
+
+Passing inline function callbacks (onComplete) into useEffect dependency arrays causes continuous cleanup and timer cancellation on re-renders, causing infinite loading loops
+
+
 ### 2026-08-18_14-49-15-609Z.md
 # Lessons Entry
 
@@ -264,6 +286,17 @@ Arcjet IP detection fails in dev mode — use x-forwarded-for header fallback fo
 ---
 
 ## Decisions
+
+### 2026-08-18_15-14-42-213Z.md
+# Decisions Entry
+
+**Date:** 2026-08-18T15:14:42.213Z
+**Related Task:** N/A
+
+---
+
+Restructured IntroAnimation as a self-contained fixed overlay with an empty dependency array in useEffect to prevent timer reset loops when props change
+
 
 ### 2026-08-18_14-49-11-936Z.md
 # Decisions Entry
